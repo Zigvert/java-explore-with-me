@@ -9,4 +9,3 @@ spring:
     show-sql: true
 server:
   port: 9090
-
