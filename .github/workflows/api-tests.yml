@@ -4,5 +4,51 @@ on:
   pull_request:
 
 jobs:
-  build:
-    uses: yandex-praktikum/java-explore-with-me/.github/workflows/api-tests.yml@ci
+  api-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: explore_with_me
+          POSTGRES_USER: explore
+          POSTGRES_PASSWORD: explore
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U explore -d explore_with_me"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build services
+        run: |
+          ./mvnw clean package -DskipTests
+
+      - name: Build Docker images
+        run: |
+          docker build -t stats-service ./stats-service
+          docker build -t main-service ./main-service
+
+      - name: Start docker-compose
+        run: docker-compose -f docker-compose.yml up -d
+
+      - name: Wait for services
+        run: |
+          chmod +x ./wait-for-it.sh
+          ./wait-for-it.sh localhost:9090 -t 120
+          ./wait-for-it.sh localhost:8080 -t 120
+
+      - name: Run API tests
+        run: ./mvnw test -P api-tests
