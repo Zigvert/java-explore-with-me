@@ -5,7 +5,7 @@ FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
 
 # Копируем jar-файл сервиса статистики в контейнер
-COPY target/stats-service-0.0.1-SNAPSHOT.jar app.jar
+COPY target/ewm-stats-service-0.0.1-SNAPSHOT.jar app.jar
 
 # Открываем порт
 EXPOSE 9090

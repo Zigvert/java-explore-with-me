@@ -32,13 +32,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Build ewm-stats-service jar
-        working-directory: ./ewm-stats-service
-        run: mvn clean package -DskipTests
-
-      - name: Build main-service jar
-        working-directory: ./main-service
-        run: mvn clean package -DskipTests
+      - name: Build all modules and install to local repo
+        run: mvn clean install -DskipTests
 
       - name: Build Docker images
         run: |
