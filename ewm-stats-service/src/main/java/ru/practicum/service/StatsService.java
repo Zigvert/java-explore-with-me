@@ -27,10 +27,20 @@ public class StatsService {
     }
 
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        boolean hasUris = uris != null && !uris.isEmpty();
+
         if (unique) {
-            return repository.findStatsUnique(start, end, uris);
+            if (hasUris) {
+                return repository.findStatsUniqueByUris(start, end, uris);
+            } else {
+                return repository.findStatsUnique(start, end);
+            }
         } else {
-            return repository.findStats(start, end, uris);
+            if (hasUris) {
+                return repository.findStatsByUris(start, end, uris);
+            } else {
+                return repository.findStats(start, end);
+            }
         }
     }
 }
