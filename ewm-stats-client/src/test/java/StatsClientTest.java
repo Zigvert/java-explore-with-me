@@ -1,8 +1,6 @@
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.client.StatsClient;
 import ru.practicum.dto.EndpointHitDto;
