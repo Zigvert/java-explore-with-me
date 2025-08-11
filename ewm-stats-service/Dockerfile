@@ -1,7 +1,7 @@
 FROM eclipse-temurin:21-jre
 
-ARG JAR_FILE=target/ewm-stats-service-0.0.1-SNAPSHOT.jar
+WORKDIR /app
 
-COPY ${JAR_FILE} /app.jar
+COPY target/*.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "/app.jar", "--server.address=0.0.0.0"]
+ENTRYPOINT ["java", "-jar", "app.jar", "--server.address=0.0.0.0"]
