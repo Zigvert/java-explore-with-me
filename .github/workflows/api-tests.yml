@@ -31,14 +31,13 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      
+
       - name: Build services
-        run:
-          mvn clean package -DskipTests
+        run: mvn clean package -DskipTests
 
       - name: Build Docker images
         run: |
-          docker build -t stats-service ./stats-service
+          docker build -t stats-service ./ewm-stats-service
           docker build -t main-service ./main-service
 
       - name: Start docker-compose
@@ -51,4 +50,4 @@ jobs:
           ./wait-for-it.sh localhost:8080 -t 120
 
       - name: Run API tests
-        run: ./mvnw test -P api-tests
+        run: mvn test -P api-tests
