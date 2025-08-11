@@ -32,18 +32,16 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      # Собираем весь проект из корня, пропуская тесты
-      - name: Build entire project
+      - name: Build entire project (skip tests)
         run: mvn clean install -DskipTests
 
-      # Строим докер-образ из ewm-stats-service
-      - name: Build Docker image
+      - name: Build Docker image for stats-service
         run: docker build -t stats-service ./ewm-stats-service
 
-      - name: Start docker-compose
-        run: docker-compose -f docker-compose.yml up -d
+      - name: Start docker-compose services
+        run: docker compose -f docker-compose.yml up -d
 
-      - name: Wait for services
+      - name: Wait for stats-server service to be ready
         run: |
           chmod +x ./wait-for-it.sh
           ./wait-for-it.sh localhost:9090 -t 120

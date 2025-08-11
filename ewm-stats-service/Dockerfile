@@ -1,14 +1,14 @@
-# Используем базовый образ с JDK 17
-FROM eclipse-temurin:17-jdk-alpine
+# Используем базовый образ с JDK 21 Alpine для компактности
+FROM eclipse-temurin:21-jdk-alpine
 
-# Указываем рабочую директорию
+# Рабочая директория внутри контейнера
 WORKDIR /app
 
-# Копируем jar-файл сервиса статистики в контейнер
+# Копируем собранный jar в контейнер
 COPY target/ewm-stats-service-0.0.1-SNAPSHOT.jar app.jar
 
-# Открываем порт
+# Открываем порт 9090
 EXPOSE 9090
 
-# Запускаем сервис
+# Запускаем приложение
 ENTRYPOINT ["java", "-jar", "app.jar"]
