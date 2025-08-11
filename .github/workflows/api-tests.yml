@@ -32,13 +32,12 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Build all modules and install to local repo
-        run: mvn clean install -DskipTests
+      - name: Build ewm-stats-service jar
+        working-directory: ./ewm-stats-service
+        run: mvn clean package -DskipTests
 
-      - name: Build Docker images
-        run: |
-          docker build -t stats-service ./ewm-stats-service
-          docker build -t main-service ./main-service
+      - name: Build Docker image
+        run: docker build -t stats-service ./ewm-stats-service
 
       - name: Start docker-compose
         run: docker-compose -f docker-compose.yml up -d
@@ -47,7 +46,6 @@ jobs:
         run: |
           chmod +x ./wait-for-it.sh
           ./wait-for-it.sh localhost:9090 -t 120
-          ./wait-for-it.sh localhost:8080 -t 120
 
       - name: Run API tests
         run: mvn test -P api-tests
