@@ -7,4 +7,4 @@ COPY wait-for-it.sh /wait-for-it.sh
 
 RUN chmod +x /wait-for-it.sh
 
-ENTRYPOINT ["bash", "/wait-for-it.sh", "stats-db:5432", "--timeout=60", "--", "java", "-jar", "/app.jar"]
+ENTRYPOINT ["bash", "/wait-for-it.sh", "stats-db:5432", "--timeout=60", "--strict", "--", "java", "-jar", "/app.jar"]
