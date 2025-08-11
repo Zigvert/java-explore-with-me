@@ -32,17 +32,13 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Build and install ewm-stats-dto
-        working-directory: ./ewm-stats-dto
+      # Собираем весь проект из корня, пропуская тесты
+      - name: Build entire project
         run: mvn clean install -DskipTests
 
-      - name: Build ewm-stats-service
-        working-directory: ./ewm-stats-service
-        run: mvn clean package -DskipTests
-
-      - name: Build Docker images
-        run: |
-          docker build -t stats-service ./ewm-stats-service
+      # Строим докер-образ из ewm-stats-service
+      - name: Build Docker image
+        run: docker build -t stats-service ./ewm-stats-service
 
       - name: Start docker-compose
         run: docker-compose -f docker-compose.yml up -d
