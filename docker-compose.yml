@@ -23,10 +23,9 @@ services:
       - ewm-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U stats -d stats"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 5
-
+      retries: 15
   ewm-db:
     image: postgres:16.1
     environment:
@@ -41,9 +40,9 @@ services:
       - ewm-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ewm -d ewm"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 15
 
   stats-server:
     build:
@@ -58,6 +57,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats
       SPRING_DATASOURCE_USERNAME: stats
       SPRING_DATASOURCE_PASSWORD: stats
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
     restart: on-failure
     networks:
       - ewm-network
