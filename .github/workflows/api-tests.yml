@@ -35,10 +35,8 @@ jobs:
       - name: Build entire project (skip tests)
         run: mvn clean install -DskipTests
 
-      - name: Build Docker images
-        run: |
-          docker build -t stats-server ./ewm-stats-service
-          docker build -t main-server ./ewm-main-service
+      - name: Build Docker image for stats-service
+        run: docker build -t stats-server ./ewm-stats-service
 
       - name: Start docker-compose services
         run: docker compose -f docker-compose.yml up -d

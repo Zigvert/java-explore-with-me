@@ -31,14 +31,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 20
-
-  main-server:
-    build: ./ewm-main-service
-    container_name: main-server
-    depends_on:
-      stats-server:
-        condition: service_healthy
-    environment:
-      STAT_SERVER_URL: http://stats-server:9090
-    ports:
-      - "8080:8080"
