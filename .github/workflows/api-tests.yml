@@ -20,7 +20,7 @@ jobs:
           --health-cmd="pg_isready -U explore -d explore_with_me"
           --health-interval=5s
           --health-timeout=5s
-          --health-retries=5
+          --health-retries=10
 
     steps:
       - name: Checkout repository
@@ -44,13 +44,14 @@ jobs:
       - name: Check running containers
         run: docker ps -a
 
-      - name: Show logs of stats-server container
-        run: docker logs $(docker ps -qf "name=stats-server")
-
       - name: Wait for stats-server service to be ready
         run: |
           chmod +x .github/workflows/wait-for-it.sh
-          .github/workflows/wait-for-it.sh stats-server:9090 -t 120
+          .github/workflows/wait-for-it.sh stats-server:9090 -t 300 || (
+            echo "❌ stats-server did not start in time. Showing logs:" &&
+            docker logs $(docker ps -qf "name=stats-server") &&
+            exit 1
+          )
 
       - name: Run API tests
         run: mvn test -P api-tests
