@@ -44,14 +44,15 @@ jobs:
       - name: Check running containers
         run: docker ps -a
 
-      - name: Wait for stats-server service to be ready
+      - name: Show logs of stats-server (debug)
+        run: docker logs $(docker ps -qf "name=stats-server") || true
+
+      - name: Wait for stats-server health endpoint
         run: |
           chmod +x .github/workflows/wait-for-it.sh
-          .github/workflows/wait-for-it.sh stats-server:9090 -t 300 || (
-            echo "❌ stats-server did not start in time. Showing logs:" &&
-            docker logs $(docker ps -qf "name=stats-server") &&
-            exit 1
-          )
+          echo "⏳ Waiting for stats-server:9090/actuator/health ..."
+          .github/workflows/wait-for-it.sh stats-server:9090 -t 300
+          curl -s --retry 30 --retry-delay 5 --retry-connrefused http://localhost:9090/actuator/health
 
       - name: Run API tests
         run: mvn test -P api-tests
