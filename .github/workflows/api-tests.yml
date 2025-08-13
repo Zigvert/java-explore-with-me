@@ -14,13 +14,13 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: stats
+          POSTGRES_PASSWORD: stats
           POSTGRES_DB: stats
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U postgres"
+          --health-cmd "pg_isready -U stats"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -32,21 +32,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Build Java project
+        run: mvn clean package -DskipTests
+
       - name: Build and start stats-server
-        run: |
-          docker compose -f docker-compose.yml up -d --build stats-db stats-server
+        run: docker compose -f docker-compose.yml up -d --build stats-db stats-server
 
       - name: Wait for Postgres to be ready
         run: |
-          until docker exec $(docker ps -qf "name=stats-db") pg_isready -U postgres; do
+          until docker exec $(docker ps -qf "name=stats-db") pg_isready -U stats; do
             echo "Waiting for Postgres..."
             sleep 5
           done
 
       - name: Run tests
-        run: |
-          # Здесь запускаем тесты Java (Maven/Gradle)
-          ./mvnw clean test
+        run: mvn clean test
 
       - name: Shutdown containers
         run: docker compose -f docker-compose.yml down -v
