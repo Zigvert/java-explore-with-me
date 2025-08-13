@@ -9,7 +9,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:14
+        image: postgres:16
         env:
           POSTGRES_DB: explore_with_me
           POSTGRES_USER: explore
@@ -39,20 +39,25 @@ jobs:
         run: docker build -t stats-server ./ewm-stats-service
 
       - name: Start docker-compose services
-        run: docker compose -f docker-compose.yml up -d
+        run: docker compose -f docker-compose.yml up -d --build
 
       - name: Check running containers
         run: docker ps -a
 
-      - name: Show logs of stats-server (debug)
-        run: docker logs $(docker ps -qf "name=stats-server") || true
-
       - name: Wait for stats-server health endpoint
         run: |
-          chmod +x .github/workflows/wait-for-it.sh
-          echo "⏳ Waiting for stats-server:9090/actuator/health ..."
-          .github/workflows/wait-for-it.sh stats-server:9090 -t 300
-          curl -s --retry 30 --retry-delay 5 --retry-connrefused http://localhost:9090/actuator/health
+          echo "⏳ Waiting for stats-server actuator health..."
+          for i in {1..60}; do
+            if curl -s http://localhost:9090/actuator/health | grep '"status":"UP"' > /dev/null; then
+              echo "✅ Stats-server is healthy"
+              exit 0
+            fi
+            echo "Waiting... ($i/60)"
+            sleep 5
+          done
+          echo "❌ Stats-server did not become healthy. Showing logs:"
+          docker logs $(docker ps -qf "name=stats-server")
+          exit 1
 
       - name: Run API tests
         run: mvn test -P api-tests
