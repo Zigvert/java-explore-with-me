@@ -1,5 +1,8 @@
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.client.StatsClient;
@@ -12,7 +15,11 @@ public class StatsClientTest {
         RestTemplate restTemplate = mock(RestTemplate.class);
         StatsClient client = new StatsClient(restTemplate);
 
-        EndpointHitDto dto = new EndpointHitDto("ewm", "/events", "192.168.0.1", "2025-08-11T12:00:00");
+        // Создаем LocalDateTime вместо строки
+        LocalDateTime timestamp = LocalDateTime.parse("2025-08-11 12:00:00",
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        EndpointHitDto dto = new EndpointHitDto("ewm", "/events", "192.168.0.1", timestamp);
 
         client.saveHit(dto);
 

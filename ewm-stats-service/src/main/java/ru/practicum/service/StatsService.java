@@ -21,7 +21,7 @@ public class StatsService {
                 .app(dto.getApp())
                 .uri(dto.getUri())
                 .ip(dto.getIp())
-                .timestamp(LocalDateTime.parse(dto.getTimestamp()))
+                .timestamp(dto.getTimestamp()) // уже LocalDateTime
                 .build();
         repository.save(hit);
     }

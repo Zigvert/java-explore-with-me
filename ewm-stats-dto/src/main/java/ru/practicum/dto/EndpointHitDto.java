@@ -15,7 +15,6 @@ public class EndpointHitDto {
     private String uri;
     private String ip;
 
-    // Указываем формат для JSON, чтобы корректно парсился LocalDateTime
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timestamp;
 }
