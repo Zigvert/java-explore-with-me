@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.service.StatsService;
@@ -31,18 +32,26 @@ public class StatsController {
             @RequestParam(required = false) List<String> uris,
             @RequestParam(defaultValue = "false") boolean unique
     ) {
+        LocalDateTime startTime;
+        LocalDateTime endTime;
+
         try {
-            LocalDateTime startTime = LocalDateTime.parse(start);
-            LocalDateTime endTime = LocalDateTime.parse(end);
-
-            if (endTime.isBefore(startTime)) {
-                throw new IllegalArgumentException("Некорректный интервал: конец раньше начала");
-            }
-
-            return statsService.getStats(startTime, endTime, uris, unique);
-
+            startTime = LocalDateTime.parse(start);
+            endTime = LocalDateTime.parse(end);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Неверный формат даты/времени. Используйте ISO-8601, например: 2025-08-19T10:15:30");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Неверный формат даты/времени. Используйте ISO-8601, например: 2025-08-19T10:15:30"
+            );
         }
+
+        if (endTime.isBefore(startTime)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Некорректный интервал: время окончания раньше времени начала"
+            );
+        }
+
+        return statsService.getStats(startTime, endTime, uris, unique);
     }
 }
