@@ -1,20 +1,28 @@
-# === Stage 1: build jar ===
-FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
+# === Stage 1: Build ===
+FROM maven:3.9.3-eclipse-temurin-21 AS builder
+
 WORKDIR /app
 
-# Копируем pom.xml и скачиваем зависимости
+# Копируем родительский проект
+COPY ../explore-with-me /app/explore-with-me
+
+# Копируем сам сервис
 COPY pom.xml .
 COPY src ./src
+
+# Сборка без запуска тестов
 RUN mvn clean package -DskipTests
 
-# === Stage 2: runtime image ===
-FROM eclipse-temurin:21-jdk-alpine
+# === Stage 2: Runtime ===
+FROM eclipse-temurin:21-jre
+
 WORKDIR /app
 
-# Копируем jar из builder stage
-COPY --from=builder /app/target/ewm-stats-service-*.jar app.jar
+# Копируем jar из builder
+COPY --from=builder /app/target/ewm-stats-service-0.0.1-SNAPSHOT.jar ./ewm-stats-service.jar
 
-# Переменные окружения (можно переопределить через docker-compose)
-ENV JAVA_OPTS=""
+# Указываем порт
+EXPOSE 9090
 
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+# Команда запуска
+ENTRYPOINT ["java","-jar","ewm-stats-service.jar"]
