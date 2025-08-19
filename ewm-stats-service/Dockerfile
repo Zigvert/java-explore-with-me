@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM maven:3.9.3-eclipse-temurin-17 AS builder
+FROM maven:3.9.3-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
@@ -12,11 +12,11 @@ COPY ewm-stats-client/src ewm-stats-client/src
 COPY ewm-stats-service/pom.xml ewm-stats-service/
 COPY ewm-stats-service/src ewm-stats-service/src
 
-# Собираем весь проект и устанавливаем модули в локальный репозиторий Maven
+# Сборка всех модулей и установка в локальный Maven-репозиторий
 RUN mvn clean install -DskipTests
 
 # Stage 2: Runtime
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
