@@ -1,6 +1,7 @@
 package ru.practicum.client;
 
-import org.springframework.http.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.dto.EndpointHitDto;
@@ -14,7 +15,9 @@ import java.util.*;
 public class StatsClient {
 
     private final RestTemplate restTemplate;
-    private final String statsServiceUrl = "http://localhost:9090"; // можно параметризовать
+
+    @Value("${stats.service.url}")
+    private String statsServiceUrl; // подтягиваем из application.properties
 
     public StatsClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -30,18 +33,23 @@ public class StatsClient {
             String startEncoded = URLEncoder.encode(start, StandardCharsets.UTF_8.toString());
             String endEncoded = URLEncoder.encode(end, StandardCharsets.UTF_8.toString());
 
-            StringBuilder urlBuilder = new StringBuilder(statsServiceUrl + "/stats?start=" + startEncoded + "&end=" + endEncoded);
+            StringBuilder urlBuilder = new StringBuilder(statsServiceUrl)
+                    .append("/stats?start=").append(startEncoded)
+                    .append("&end=").append(endEncoded);
+
             if (uris != null && !uris.isEmpty()) {
-                for (String uri : uris) {
-                    urlBuilder.append("&uris=").append(URLEncoder.encode(uri, StandardCharsets.UTF_8.toString()));
-                }
+                String joinedUris = String.join(",", uris);
+                urlBuilder.append("&uris=").append(URLEncoder.encode(joinedUris, StandardCharsets.UTF_8.toString()));
             }
+
             urlBuilder.append("&unique=").append(unique);
 
-            ResponseEntity<ViewStatsDto[]> response = restTemplate.getForEntity(urlBuilder.toString(), ViewStatsDto[].class);
+            ResponseEntity<ViewStatsDto[]> response =
+                    restTemplate.getForEntity(urlBuilder.toString(), ViewStatsDto[].class);
+
             return Arrays.asList(Objects.requireNonNull(response.getBody()));
         } catch (Exception e) {
-            // обработка ошибок
+            // логируем и возвращаем пустой список
             e.printStackTrace();
             return Collections.emptyList();
         }

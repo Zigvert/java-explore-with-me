@@ -9,6 +9,7 @@ import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.service.StatsService;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -30,8 +31,18 @@ public class StatsController {
             @RequestParam(required = false) List<String> uris,
             @RequestParam(defaultValue = "false") boolean unique
     ) {
-        LocalDateTime startTime = LocalDateTime.parse(start);
-        LocalDateTime endTime = LocalDateTime.parse(end);
-        return statsService.getStats(startTime, endTime, uris, unique);
+        try {
+            LocalDateTime startTime = LocalDateTime.parse(start);
+            LocalDateTime endTime = LocalDateTime.parse(end);
+
+            if (endTime.isBefore(startTime)) {
+                throw new IllegalArgumentException("Некорректный интервал: конец раньше начала");
+            }
+
+            return statsService.getStats(startTime, endTime, uris, unique);
+
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Неверный формат даты/времени. Используйте ISO-8601, например: 2025-08-19T10:15:30");
+        }
     }
 }
