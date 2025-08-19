@@ -3,11 +3,11 @@ FROM maven:3.9.3-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
-# Копируем весь проект (родительский POM и подпроекты)
-COPY . .
+# Копируем весь проект (родительский POM и все подпроекты)
+COPY ../.. /app
 
-# Сборка всего проекта без запуска тестов
-RUN mvn clean install -DskipTests
+# Сборка только модуля ewm-stats-service без тестов
+RUN mvn clean install -pl ewm-stats-service -am -DskipTests
 
 # === Stage 2: Runtime ===
 FROM eclipse-temurin:17-jre

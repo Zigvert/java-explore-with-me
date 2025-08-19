@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: stats
       POSTGRES_PASSWORD: stats
     ports:
-      - "6541:5432" # внешний порт 6541 -> внутренний 5432
+      - "6541:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U stats -d stats"]
       interval: 5s
@@ -22,7 +22,9 @@ services:
       - ewm-net
 
   stats-server:
-    build: ./ewm-stats-service
+    build:
+      context: ../..   # корень проекта, чтобы Dockerfile видел родительский POM
+      dockerfile: ./ewm-stats-service/Dockerfile
     container_name: stats-server
     depends_on:
       stats-db:
