@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   stats-db:
     image: postgres:16
@@ -23,7 +21,7 @@ services:
 
   stats-server:
     build:
-      context: ../..   # корень проекта, чтобы Dockerfile видел родительский POM
+      context: .  # корень репозитория
       dockerfile: ./ewm-stats-service/Dockerfile
     container_name: stats-server
     depends_on:
