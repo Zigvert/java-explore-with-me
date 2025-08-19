@@ -2,6 +2,7 @@ package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
@@ -17,8 +18,9 @@ public class StatsController {
     private final StatsService statsService;
 
     @PostMapping("/hit")
-    public void saveHit(@RequestBody EndpointHitDto dto) {
+    public ResponseEntity<EndpointHitDto> saveHit(@RequestBody EndpointHitDto dto) {
         statsService.saveHit(dto);
+        return ResponseEntity.ok(dto); // возвращаем объект обратно для Postman
     }
 
     @GetMapping("/stats")

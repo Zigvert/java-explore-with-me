@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> {
 
-    // Если uris не передаём (null или пустой), то берём все uri
+    // Все просмотры без фильтра по uris
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(h)) " +
             "FROM EndpointHit h " +
             "WHERE h.timestamp BETWEEN :start AND :end " +
@@ -20,7 +20,7 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
     List<ViewStatsDto> findStats(@Param("start") LocalDateTime start,
                                  @Param("end") LocalDateTime end);
 
-    // Если хотим фильтрацию по uris
+    // Все просмотры с фильтром по uris
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(h)) " +
             "FROM EndpointHit h " +
             "WHERE h.timestamp BETWEEN :start AND :end " +
@@ -31,6 +31,7 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
                                        @Param("end") LocalDateTime end,
                                        @Param("uris") List<String> uris);
 
+    // Уникальные просмотры (по ip) без фильтра по uris
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(DISTINCT h.ip)) " +
             "FROM EndpointHit h " +
             "WHERE h.timestamp BETWEEN :start AND :end " +
@@ -39,6 +40,7 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
     List<ViewStatsDto> findStatsUnique(@Param("start") LocalDateTime start,
                                        @Param("end") LocalDateTime end);
 
+    // Уникальные просмотры (по ip) с фильтром по uris
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(DISTINCT h.ip)) " +
             "FROM EndpointHit h " +
             "WHERE h.timestamp BETWEEN :start AND :end " +
