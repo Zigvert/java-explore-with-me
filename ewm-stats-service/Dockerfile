@@ -1,12 +1,12 @@
 # === Stage 1: Build ===
-FROM maven:3.9.3-eclipse-temurin-21 AS builder
+FROM maven:3.9.3-jdk-21 AS builder
 
 WORKDIR /app
 
-# Копируем родительский проект
+# Копируем родительский проект (если нужен)
 COPY ../explore-with-me /app/explore-with-me
 
-# Копируем сам сервис
+# Копируем сервис
 COPY pom.xml .
 COPY src ./src
 
