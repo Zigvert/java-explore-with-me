@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> {
 
-    // Все просмотры без фильтра по uris
+    // Все просмотры без фильтра по URIs
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(h)) " +
             "FROM EndpointHit h " +
             "WHERE h.timestamp BETWEEN :start AND :end " +
@@ -20,18 +20,18 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
     List<ViewStatsDto> findStats(@Param("start") LocalDateTime start,
                                  @Param("end") LocalDateTime end);
 
-    // Все просмотры с фильтром по uris
+    // Все просмотры с фильтром по URIs
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(h)) " +
             "FROM EndpointHit h " +
             "WHERE h.timestamp BETWEEN :start AND :end " +
-            "AND h.uri IN :uris " +
+            "AND (:uris IS NULL OR h.uri IN :uris) " +
             "GROUP BY h.app, h.uri " +
             "ORDER BY COUNT(h) DESC")
     List<ViewStatsDto> findStatsByUris(@Param("start") LocalDateTime start,
                                        @Param("end") LocalDateTime end,
                                        @Param("uris") List<String> uris);
 
-    // Уникальные просмотры (по ip) без фильтра по uris
+    // Уникальные просмотры (по IP) без фильтра по URIs
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(DISTINCT h.ip)) " +
             "FROM EndpointHit h " +
             "WHERE h.timestamp BETWEEN :start AND :end " +
@@ -40,11 +40,11 @@ public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> 
     List<ViewStatsDto> findStatsUnique(@Param("start") LocalDateTime start,
                                        @Param("end") LocalDateTime end);
 
-    // Уникальные просмотры (по ip) с фильтром по uris
+    // Уникальные просмотры (по IP) с фильтром по URIs
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(DISTINCT h.ip)) " +
             "FROM EndpointHit h " +
             "WHERE h.timestamp BETWEEN :start AND :end " +
-            "AND h.uri IN :uris " +
+            "AND (:uris IS NULL OR h.uri IN :uris) " +
             "GROUP BY h.app, h.uri " +
             "ORDER BY COUNT(DISTINCT h.ip) DESC")
     List<ViewStatsDto> findStatsUniqueByUris(@Param("start") LocalDateTime start,
