@@ -1,12 +1,9 @@
 # === Stage 1: Build ===
-FROM maven:3.9.3-jdk-21 AS builder
+FROM maven:3.9.3-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
-# Копируем родительский проект (если нужен)
-COPY ../explore-with-me /app/explore-with-me
-
-# Копируем сервис
+# Копируем pom.xml и src
 COPY pom.xml .
 COPY src ./src
 
@@ -14,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # === Stage 2: Runtime ===
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
