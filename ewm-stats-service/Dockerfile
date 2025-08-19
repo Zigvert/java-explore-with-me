@@ -4,12 +4,12 @@ FROM maven:3.9.3-eclipse-temurin-17 AS builder
 WORKDIR /app
 
 # Копируем родительский POM и модуль сервиса
-COPY pom.xml ./            # родительский POM (Explore With Me)
-COPY ewm-stats-service/pom.xml ./ewm-stats-service/pom.xml
-COPY ewm-stats-service/src ./ewm-stats-service/src
+COPY pom.xml explore-with-me-pom.xml
+COPY ewm-stats-service/pom.xml ewm-stats-service/pom.xml
+COPY ewm-stats-service/src ewm-stats-service/src
 
 # Собираем только модуль ewm-stats-service с учетом зависимостей родителя
-RUN mvn clean package -pl ewm-stats-service -am -DskipTests
+RUN mvn clean package -f ewm-stats-service/pom.xml -DskipTests
 
 # === Stage 2: Runtime ===
 FROM eclipse-temurin:17-jre
