@@ -1,28 +1,28 @@
-# === Stage 1: Build ===
+# Stage 1: Build
 FROM maven:3.9.3-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
-# Копируем родительский POM
-COPY pom.xml ./pom.xml
+# Копируем весь проект (родительский POM и модули)
+COPY pom.xml .
+COPY ewm-stats-dto/pom.xml ewm-stats-dto/
+COPY ewm-stats-dto/src ewm-stats-dto/src
+COPY ewm-stats-client/pom.xml ewm-stats-client/
+COPY ewm-stats-client/src ewm-stats-client/src
+COPY ewm-stats-service/pom.xml ewm-stats-service/
+COPY ewm-stats-service/src ewm-stats-service/src
 
-# Копируем все модули (или только сервис, если родитель уже есть)
-COPY ewm-stats-service ./ewm-stats-service
+# Собираем весь проект и устанавливаем модули в локальный репозиторий Maven
+RUN mvn clean install -DskipTests
 
-# Устанавливаем родительский POM в локальный репозиторий
-RUN mvn install -N -f pom.xml
-
-# Сборка сервиса с установленным родителем
-RUN mvn clean package -DskipTests -f ewm-stats-service/pom.xml
-
-# === Stage 2: Runtime ===
+# Stage 2: Runtime
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-# Копируем собранный JAR сервиса
+# Копируем готовый JAR сервиса
 COPY --from=builder /app/ewm-stats-service/target/ewm-stats-service-0.0.1-SNAPSHOT.jar ./ewm-stats-service.jar
 
 EXPOSE 9090
 
-ENTRYPOINT ["java", "-jar", "ewm-stats-service.jar"]
+ENTRYPOINT ["java","-jar","ewm-stats-service.jar"]
