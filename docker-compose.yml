@@ -43,21 +43,6 @@ services:
     networks:
       - ewm-net
 
-  main-server:
-    build: ./main-service
-    container_name: main-server
-    depends_on:
-      stats-server:
-        condition: service_healthy
-    environment:
-      STAT_SERVER_URL: http://stats-server:9090
-      SPRING_PROFILES_ACTIVE: docker
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
-    networks:
-      - ewm-net
-
 volumes:
   stats-db-data:
 
