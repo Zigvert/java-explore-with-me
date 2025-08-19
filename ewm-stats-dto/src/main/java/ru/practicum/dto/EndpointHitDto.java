@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -11,5 +14,8 @@ public class EndpointHitDto {
     private String app;
     private String uri;
     private String ip;
-    private String timestamp;  // ISO 8601 string, например "2023-07-21T15:32:00"
+
+    // Указываем формат для JSON, чтобы корректно парсился LocalDateTime
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime timestamp;
 }
