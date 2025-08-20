@@ -5,16 +5,16 @@ WORKDIR /app
 # Копируем все pom.xml и исходники проекта
 COPY . .
 
-# Скачиваем все зависимости и собираем все модули
+# Скачиваем зависимости и собираем все модули
 RUN mvn clean install -DskipTests
 
 # Stage 2: runtime с JRE 21
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Копируем собранный jar stats-service
-COPY --from=build /app/ewm-stats-service/target/ewm-stats-service-0.0.1-SNAPSHOT.jar app.jar
+# Копируем собранный jar main-service
+COPY --from=build /app/ewm-main-service/target/ewm-main-service-0.0.1-SNAPSHOT.jar app.jar
 
-EXPOSE 9090
+EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
