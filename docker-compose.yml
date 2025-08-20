@@ -29,6 +29,8 @@ services:
     depends_on:
       main-db:
         condition: service_healthy
+      stats-server:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://main-db:5432/main
       SPRING_DATASOURCE_USERNAME: main
@@ -36,7 +38,6 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8080:8080"
-    command: ["./wait-for-it.sh", "main-db:5432", "--timeout=60", "--strict", "--", "java", "-jar", "main-service.jar"]
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
       interval: 5s
@@ -81,7 +82,6 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "9090:9090"
-    command: ["./wait-for-it.sh", "stats-db:5432", "--timeout=60", "--strict", "--", "java", "-jar", "stats-service.jar"]
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:9090/actuator/health || exit 1"]
       interval: 5s
