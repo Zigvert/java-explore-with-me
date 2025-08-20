@@ -2,18 +2,24 @@
 FROM maven:3.9.9-eclipse-temurin-21 AS builder
 WORKDIR /app
 
-# Копируем весь проект для сборки зависимостей
-COPY ../../ .
+# Копируем весь проект
+COPY . .
 
-# Сборка только stats-service (можно пропустить тесты)
-RUN mvn clean install -DskipTests -pl ewm-stats-service -am
+# Сборка всех модулей
+RUN mvn clean install -DskipTests
 
 # Stage 2: Runtime
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
+# Скопируем скрипт wait-for-it
+COPY .github/workflows/wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
 # Копируем собранный JAR
 COPY --from=builder /app/ewm-stats-service/target/ewm-stats-service-0.0.1-SNAPSHOT.jar ./stats-service.jar
 
 EXPOSE 9090
-ENTRYPOINT ["java", "-jar", "stats-service.jar"]
+
+# Ждём БД и запускаем сервис
+ENTRYPOINT ["/wait-for-it.sh", "stats-db:5432", "--", "java", "-jar", "stats-service.jar"]
