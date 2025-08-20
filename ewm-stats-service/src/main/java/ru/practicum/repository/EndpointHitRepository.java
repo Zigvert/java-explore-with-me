@@ -11,23 +11,43 @@ import java.util.List;
 
 public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> {
 
+    // Все просмотры без фильтра по URIs
+    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(h)) " +
+            "FROM EndpointHit h " +
+            "WHERE h.timestamp BETWEEN :start AND :end " +
+            "GROUP BY h.app, h.uri " +
+            "ORDER BY COUNT(h) DESC")
+    List<ViewStatsDto> findStats(@Param("start") LocalDateTime start,
+                                 @Param("end") LocalDateTime end);
+
+    // Все просмотры с фильтром по URIs
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(h)) " +
             "FROM EndpointHit h " +
             "WHERE h.timestamp BETWEEN :start AND :end " +
             "AND (:uris IS NULL OR h.uri IN :uris) " +
             "GROUP BY h.app, h.uri " +
             "ORDER BY COUNT(h) DESC")
-    List<ViewStatsDto> findStats(@Param("start") LocalDateTime start,
-                                 @Param("end") LocalDateTime end,
-                                 @Param("uris") List<String> uris);
-    
+    List<ViewStatsDto> findStatsByUris(@Param("start") LocalDateTime start,
+                                       @Param("end") LocalDateTime end,
+                                       @Param("uris") List<String> uris);
+
+    // Уникальные просмотры (по IP) без фильтра по URIs
+    @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(DISTINCT h.ip)) " +
+            "FROM EndpointHit h " +
+            "WHERE h.timestamp BETWEEN :start AND :end " +
+            "GROUP BY h.app, h.uri " +
+            "ORDER BY COUNT(DISTINCT h.ip) DESC")
+    List<ViewStatsDto> findStatsUnique(@Param("start") LocalDateTime start,
+                                       @Param("end") LocalDateTime end);
+
+    // Уникальные просмотры (по IP) с фильтром по URIs
     @Query("SELECT new ru.practicum.dto.ViewStatsDto(h.app, h.uri, COUNT(DISTINCT h.ip)) " +
             "FROM EndpointHit h " +
             "WHERE h.timestamp BETWEEN :start AND :end " +
             "AND (:uris IS NULL OR h.uri IN :uris) " +
             "GROUP BY h.app, h.uri " +
             "ORDER BY COUNT(DISTINCT h.ip) DESC")
-    List<ViewStatsDto> findStatsUnique(@Param("start") LocalDateTime start,
-                                       @Param("end") LocalDateTime end,
-                                       @Param("uris") List<String> uris);
+    List<ViewStatsDto> findStatsUniqueByUris(@Param("start") LocalDateTime start,
+                                             @Param("end") LocalDateTime end,
+                                             @Param("uris") List<String> uris);
 }
