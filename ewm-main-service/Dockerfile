@@ -2,11 +2,11 @@
 FROM maven:3.9.9-eclipse-temurin-21 AS builder
 WORKDIR /app
 
-# Копируем весь проект
-COPY . .
+# Копируем весь проект для сборки зависимостей
+COPY ../../ .
 
-# Сборка всех модулей
-RUN mvn clean install -DskipTests
+# Сборка только main-service (можно пропустить тесты)
+RUN mvn clean install -DskipTests -pl ewm-main-service -am
 
 # Stage 2: Runtime
 FROM eclipse-temurin:21-jre

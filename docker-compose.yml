@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Main DB
   main-db:
     image: postgres:16
     container_name: main-db
@@ -10,26 +11,25 @@ services:
       POSTGRES_PASSWORD: main
     ports:
       - "5432:5432"
+    volumes:
+      - main-db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U main -d main"]
       interval: 5s
       timeout: 3s
-      retries: 10
-    volumes:
-      - main-db-data:/var/lib/postgresql/data
+      retries: 5
     restart: unless-stopped
     networks:
       - ewm-net
 
+  # Main Service
   main-server:
     build:
       context: .
-      dockerfile: Dockerfile.main
+      dockerfile: ./ewm-main-service/Dockerfile
     container_name: main-server
     depends_on:
       main-db:
-        condition: service_healthy
-      stats-server:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://main-db:5432/main
@@ -47,6 +47,7 @@ services:
     networks:
       - ewm-net
 
+  # Stats DB
   stats-db:
     image: postgres:16
     container_name: stats-db
@@ -56,24 +57,27 @@ services:
       POSTGRES_PASSWORD: stats
     ports:
       - "6541:5432"
+    volumes:
+      - stats-db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U stats -d stats"]
       interval: 5s
       timeout: 3s
-      retries: 10
-    volumes:
-      - stats-db-data:/var/lib/postgresql/data
+      retries: 5
     restart: unless-stopped
     networks:
       - ewm-net
 
+  # Stats Service
   stats-server:
     build:
       context: .
-      dockerfile: Dockerfile.stats
+      dockerfile: ./ewm-stats-service/Dockerfile
     container_name: stats-server
     depends_on:
       stats-db:
+        condition: service_healthy
+      main-server:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats

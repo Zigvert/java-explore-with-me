@@ -1,0 +1,46 @@
+name: EWM Docker Compose Setup
+
+on:
+  pull_request:
+
+jobs:
+  docker-compose:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:24.0.5
+        options: --privileged
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Compose
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and start containers
+        run: |
+          docker-compose -f docker-compose.yml up -d --build
+
+      - name: Wait for main-server to be healthy
+        run: |
+          docker-compose exec -T main-server bash -c '
+            until curl -f http://localhost:8080/actuator/health; do
+              echo "Waiting for main-server..."
+              sleep 5
+            done
+          '
+
+      - name: Wait for stats-server to be healthy
+        run: |
+          docker-compose exec -T stats-server bash -c '
+            until curl -f http://localhost:9090/actuator/health; do
+              echo "Waiting for stats-server..."
+              sleep 5
+            done
+          '
+
+      - name: Run API tests
+        run: |
+          echo "API tests are executed by your existing api-tests.yml workflow"
