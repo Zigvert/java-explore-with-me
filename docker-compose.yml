@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   main-db:
     image: postgres:16
@@ -8,6 +10,11 @@ services:
       POSTGRES_PASSWORD: main
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U main -d main"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     volumes:
       - main-db-data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -20,8 +27,10 @@ services:
       dockerfile: Dockerfile.main
     container_name: main-server
     depends_on:
-      - main-db
-      - stats-server
+      main-db:
+        condition: service_healthy
+      stats-server:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://main-db:5432/main
       SPRING_DATASOURCE_USERNAME: main
@@ -29,6 +38,12 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
     networks:
       - ewm-net
 
@@ -41,6 +56,11 @@ services:
       POSTGRES_PASSWORD: stats
     ports:
       - "6541:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stats -d stats"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     volumes:
       - stats-db-data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -53,7 +73,8 @@ services:
       dockerfile: Dockerfile.stats
     container_name: stats-server
     depends_on:
-      - stats-db
+      stats-db:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats
       SPRING_DATASOURCE_USERNAME: stats
@@ -61,6 +82,12 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "9090:9090"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9090/actuator/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
     networks:
       - ewm-net
 
