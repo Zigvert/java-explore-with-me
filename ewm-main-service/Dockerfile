@@ -12,14 +12,14 @@ RUN mvn clean install -DskipTests
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Скопируем скрипт wait-for-it
-COPY .github/workflows/wait-for-it.sh /wait-for-it.sh
-RUN chmod +x /wait-for-it.sh
-
-# Копируем собранный JAR
+# Копируем JAR
 COPY --from=builder /app/ewm-main-service/target/ewm-main-service-0.0.1-SNAPSHOT.jar ./main-service.jar
+
+# Копируем скрипт wait-for-it.sh
+COPY wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
 
 EXPOSE 8080
 
-# Ждём БД и запускаем сервис
-ENTRYPOINT ["/wait-for-it.sh", "main-db:5432", "--", "java", "-jar", "main-service.jar"]
+# Ждем запуска базы и потом стартуем сервис
+ENTRYPOINT ["/wait-for-it.sh", "main-db:5432", "--timeout=60", "--strict", "--", "java", "-jar", "main-service.jar"]
