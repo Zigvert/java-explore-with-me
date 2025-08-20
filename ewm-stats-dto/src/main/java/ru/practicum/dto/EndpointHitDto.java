@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor         // конструктор без параметров
-@AllArgsConstructor        // конструктор со всеми полями
+@NoArgsConstructor
+@AllArgsConstructor
 public class EndpointHitDto {
 
     private String app;

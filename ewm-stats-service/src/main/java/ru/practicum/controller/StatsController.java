@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping
 public class StatsController {
 
     private final StatsService statsService;
@@ -23,8 +24,10 @@ public class StatsController {
 
     @GetMapping("/stats")
     public List<ViewStatsDto> getStats(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+            @RequestParam
+            @DateTimeFormat(pattern = DateTimeConstants.DATE_TIME_PATTERN) LocalDateTime start,
+            @RequestParam
+            @DateTimeFormat(pattern = DateTimeConstants.DATE_TIME_PATTERN) LocalDateTime end,
             @RequestParam(required = false) List<String> uris,
             @RequestParam(defaultValue = "false") boolean unique
     ) {

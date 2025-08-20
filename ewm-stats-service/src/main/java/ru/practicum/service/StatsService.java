@@ -27,19 +27,17 @@ public class StatsService {
     }
 
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        boolean hasUris = uris != null && !uris.isEmpty();
-
-        if (unique) {
-            if (hasUris) {
-                return repository.findStatsUniqueByUris(start, end, uris);
-            } else {
+        if (uris == null || uris.isEmpty()) {
+            if (unique) {
                 return repository.findStatsUnique(start, end);
-            }
-        } else {
-            if (hasUris) {
-                return repository.findStatsByUris(start, end, uris);
             } else {
                 return repository.findStats(start, end);
+            }
+        } else {
+            if (unique) {
+                return repository.findStatsUnique(start, end, uris);
+            } else {
+                return repository.findStats(start, end, uris);
             }
         }
     }
