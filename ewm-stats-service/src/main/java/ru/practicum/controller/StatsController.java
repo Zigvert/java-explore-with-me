@@ -17,11 +17,13 @@ public class StatsController {
 
     private final StatsService statsService;
 
+    // Сохранение нового хита
     @PostMapping("/hit")
     public void saveHit(@RequestBody EndpointHitDto dto) {
         statsService.saveHit(dto);
     }
 
+    // Получение статистики
     @GetMapping("/stats")
     public List<ViewStatsDto> getStats(
             @RequestParam
