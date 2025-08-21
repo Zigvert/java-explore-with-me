@@ -4,5 +4,19 @@ on:
   pull_request:
 
 jobs:
-  build:
-    uses: yandex-praktikum/java-explore-with-me/.github/workflows/api-tests.yml@ci
+  setup-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Compose
+        run: docker-compose -f docker-compose.yml up -d
+
+      - name: Wait for main service
+        run: |
+          echo "Waiting for main service on port 8080..."
+          timeout 120 bash -c 'until curl --silent http://localhost:8080/actuator/health | grep UP; do sleep 2; done'
+
+      - name: Run API tests workflow
+        uses: yandex-praktikum/java-explore-with-me/.github/workflows/api-tests.yml@ci
