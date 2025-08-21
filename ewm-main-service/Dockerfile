@@ -14,4 +14,5 @@ COPY wait-for-it.sh ./
 RUN chmod +x wait-for-it.sh
 
 EXPOSE 8080
+# Ждём только БД, stats-server стартит через depends_on
 ENTRYPOINT ["./wait-for-it.sh", "main-db:5432", "--timeout=60", "--strict", "--", "java", "-jar", "main-service.jar"]

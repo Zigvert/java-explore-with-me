@@ -56,7 +56,6 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "9090:9090"
-    # Убираем healthcheck, чтобы не зависеть от него
     restart: unless-stopped
     networks:
       - ewm-net
@@ -78,7 +77,6 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8080:8080"
-    # Убираем healthcheck
     restart: unless-stopped
     networks:
       - ewm-net
