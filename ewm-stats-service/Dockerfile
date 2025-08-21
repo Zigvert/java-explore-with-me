@@ -15,6 +15,6 @@ RUN chmod +x wait-for-it.sh
 
 EXPOSE 9090
 # Ждём только БД
-ENTRYPOINT ["./wait-for-it.sh", "stats-db:5432", "--timeout=60", "--strict", "--", "java", "-jar", "stats-service.jar"]
+ENTRYPOINT ["stats-db:5432", "--timeout=60", "--strict", "--", "java", "-jar", "stats-service.jar"]
 
 
