@@ -1,0 +1,56 @@
+name: Main Service CI
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres-main:
+        image: postgres:16.1
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: ewm_main_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U user -d ewm_main_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      postgres-stats:
+        image: postgres:16.1
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: ewm_stats_db
+        ports:
+          - 6543:5432
+        options: >-
+          --health-cmd="pg_isready -U user -d ewm_stats_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Compose
+        run: docker-compose -f docker-compose.yml up -d --build
+
+      - name: Wait for Main Service
+        run: |
+          chmod +x wait-for-it.sh
+          ./wait-for-it.sh localhost:8080 -t 120
+
+      - name: Wait for Stats Service
+        run: |
+          chmod +x wait-for-it.sh
+          ./wait-for-it.sh localhost:9090 -t 120
+
+      - name: Run API Tests
+        uses: yandex-praktikum/java-explore-with-me/.github/workflows/api-tests.yml@ci
