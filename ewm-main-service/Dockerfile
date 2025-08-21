@@ -2,7 +2,10 @@
 FROM maven:3.9.9-eclipse-temurin-21 AS builder
 WORKDIR /app
 
+# Копируем весь проект, чтобы Maven видел parent POM
 COPY . .
+
+# Сборка проекта без тестов
 RUN mvn clean install -DskipTests
 
 # Stage 2: Runtime
@@ -15,4 +18,5 @@ COPY --from=builder /app/ewm-main-service/target/ewm-main-service-0.0.1-SNAPSHOT
 RUN apt-get update && apt-get install -y postgresql-client curl
 
 EXPOSE 8080
+
 ENTRYPOINT ["sh", "-c", "until pg_isready -h main-db -p 5432 -U main -d main; do echo 'Waiting for main-db...'; sleep 2; done; until curl -f http://stats-server:9090/actuator/health; do echo 'Waiting for stats-server...'; sleep 2; done; java -jar main-service.jar"]

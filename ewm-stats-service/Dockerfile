@@ -2,7 +2,9 @@
 FROM maven:3.9.9-eclipse-temurin-21 AS builder
 WORKDIR /app
 
+# Копируем весь проект, чтобы Maven видел parent POM
 COPY . .
+
 RUN mvn clean install -DskipTests
 
 # Stage 2: Runtime
@@ -11,8 +13,8 @@ WORKDIR /app
 
 COPY --from=builder /app/ewm-stats-service/target/ewm-stats-service-0.0.1-SNAPSHOT.jar ./stats-service.jar
 
-# Устанавливаем postgresql-client и curl
 RUN apt-get update && apt-get install -y postgresql-client curl
 
 EXPOSE 9090
+
 ENTRYPOINT ["sh", "-c", "until pg_isready -h stats-db -p 5432 -U stats -d stats; do echo 'Waiting for stats-db...'; sleep 2; done; java -jar stats-service.jar"]
