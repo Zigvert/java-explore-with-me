@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://stats-db:5432/stats}
-    username: ${SPRING_DATASOURCE_USERNAME:stats}
-    password: ${SPRING_DATASOURCE_PASSWORD:stats}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://stats-db:5432/ewm_stats_db}
+    username: ${SPRING_DATASOURCE_USERNAME:user}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
   jpa:
     hibernate:
       ddl-auto: update
@@ -12,5 +12,5 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
-  port: 9090
+  port: ${SERVER_PORT:9090}
   address: 0.0.0.0

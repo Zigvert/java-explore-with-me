@@ -1,4 +1,22 @@
+version: '3.9'
+
 services:
+  stats-db:
+    image: postgres:16.1
+    container_name: ewm-stats-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ewm_stats_db
+    ports:
+      - "6543:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   stats-server:
     build: ./ewm-stats-service
     container_name: ewm-stats-server
@@ -11,19 +29,20 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/ewm_stats_db
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER_PORT=9090
       - JAVA_OPTS=-Duser.timezone=UTC
 
-  stats-db:
+  ewm-db:
     image: postgres:16.1
-    container_name: ewm-stats-db
-    ports:
-      - "6543:5432"  # Маппинг 6543 внешний -> 5432 внутренний
+    container_name: ewm-main-db
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: ewm_stats_db
+      POSTGRES_DB: ewm_main_db
+    ports:
+      - "6544:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,27 +55,13 @@ services:
       ewm-db:
         condition: service_healthy
       stats-server:
-        condition: service_started
+        condition: service_healthy
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm_main_db
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER_PORT=8080
+      - STATS_SERVICE_URL=http://stats-server:9090
       - JAVA_OPTS=-Duser.timezone=UTC
-
-  ewm-db:
-    image: postgres:16.1
-    container_name: ewm-main-db
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: ewm_main_db
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -p 5432" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
