@@ -1,44 +1,63 @@
-version: '3.8'
-
 services:
-  ewm-db:
-    image: postgres:16
-    container_name: ewm-db
-    restart: always
-    environment:
-      POSTGRES_USER: ewm
-      POSTGRES_PASSWORD: ewm
-      POSTGRES_DB: ewm
-    ports:
-      - "6541:5432"
-
-  stats-db:
-    image: postgres:16
-    container_name: stats-db
-    restart: always
-    environment:
-      POSTGRES_USER: stats
-      POSTGRES_PASSWORD: stats
-      POSTGRES_DB: stats
-    ports:
-      - "6542:5432"
-
-  ewm-service:
-    build:
-      context: .
-      dockerfile: ewm-service/Dockerfile
-    container_name: ewm-service
-    ports:
-      - "8080:8080"
+  stats-server:
+    build: ./ewm-stats-service
+    container_name: ewm-stats-server
     depends_on:
-      - ewm-db
-
-  ewm-stats-service:
-    build:
-      context: .
-      dockerfile: ewm-stats-service/Dockerfile
-    container_name: ewm-stats-service
+      stats-db:
+        condition: service_healthy
     ports:
       - "9090:9090"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/ewm_stats_db
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+      - JAVA_OPTS=-Duser.timezone=UTC
+
+  stats-db:
+    image: postgres:16.1
+    container_name: ewm-stats-db
+    ports:
+      - "6543:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ewm_stats_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  ewm-service:
+    build: ./ewm-main-service
+    container_name: ewm-main
     depends_on:
-      - stats-db
+      ewm-db:
+        condition: service_healthy
+      stats-server:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm_main_db
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+      - JAVA_OPTS=-Duser.timezone=UTC
+      - STATS_SERVICE_URL=http://stats-server:9090
+
+  ewm-db:
+    image: postgres:16.1
+    container_name: ewm-main-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ewm_main_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -p 5432"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
