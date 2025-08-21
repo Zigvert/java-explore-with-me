@@ -1,3 +1,7 @@
+server:
+  port: 9090
+  address: 0.0.0.0
+
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://stats-db:5432/ewm_stats_db}
@@ -11,6 +15,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-server:
-  port: ${SERVER_PORT:9090}
-  address: 0.0.0.0
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
