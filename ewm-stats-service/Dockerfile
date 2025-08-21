@@ -10,9 +10,9 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 COPY --from=builder /app/ewm-stats-service/target/ewm-stats-service-0.0.1-SNAPSHOT.jar ./stats-service.jar
-COPY wait-for-it.sh ./
-RUN chmod +x wait-for-it.sh
+
+# Устанавливаем postgresql-client для использования pg_isready
+RUN apt-get update && apt-get install -y postgresql-client
 
 EXPOSE 9090
-ENTRYPOINT ["./wait-for-it.sh", "stats-db:5432", "--timeout=60", "--strict", "--", "java", "-jar", "stats-service.jar"]
-
+ENTRYPOINT ["sh", "-c", "until pg_isready -h stats-db -p 5432 -U stats -d stats; do echo 'Waiting for stats-db...'; sleep 2; done; java -jar stats-service.jar"]
