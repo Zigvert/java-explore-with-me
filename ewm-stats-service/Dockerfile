@@ -11,8 +11,8 @@ WORKDIR /app
 
 COPY --from=builder /app/ewm-stats-service/target/ewm-stats-service-0.0.1-SNAPSHOT.jar ./stats-service.jar
 
-# Устанавливаем postgresql-client для использования pg_isready
-RUN apt-get update && apt-get install -y postgresql-client
+# Устанавливаем postgresql-client и curl
+RUN apt-get update && apt-get install -y postgresql-client curl
 
 EXPOSE 9090
 ENTRYPOINT ["sh", "-c", "until pg_isready -h stats-db -p 5432 -U stats -d stats; do echo 'Waiting for stats-db...'; sleep 2; done; java -jar stats-service.jar"]

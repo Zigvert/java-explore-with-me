@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   main-db:
     image: postgres:16
@@ -12,7 +14,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U main -d main"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 15
       start_period: 20s
     volumes:
       - main-db-data:/var/lib/postgresql/data
@@ -33,7 +35,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U stats -d stats"]
       interval: 5s
       timeout: 10s
-      retries: 12
+      retries: 15
       start_period: 30s
     volumes:
       - stats-db-data:/var/lib/postgresql/data
@@ -60,8 +62,8 @@ services:
       test: ["CMD-SHELL", "curl -f http://localhost:9090/actuator/health || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 30s
+      retries: 25
+      start_period: 40s
     restart: unless-stopped
     networks:
       - ewm-net
@@ -88,8 +90,8 @@ services:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 30s
+      retries: 25
+      start_period: 40s
     restart: unless-stopped
     networks:
       - ewm-net
