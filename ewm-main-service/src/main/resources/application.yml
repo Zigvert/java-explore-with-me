@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://main-db:5432/main}
-    username: ${SPRING_DATASOURCE_USERNAME:main}
-    password: ${SPRING_DATASOURCE_PASSWORD:main}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,16 +17,15 @@ server:
 
 stats:
   service:
-    url: ${STATS_SERVICE_URL:http://stats-server:9090}
+    url: ${STATS_SERVICE_URL}
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info  # можно добавить: metrics,prometheus
+        include: health,info
   endpoint:
     health:
       show-details: always
   server:
     port: 8080
-
