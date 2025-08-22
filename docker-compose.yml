@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   stats-db:
     image: postgres:16.1
@@ -19,7 +21,8 @@ services:
     build: ./ewm-stats-service
     container_name: ewm-stats-server
     depends_on:
-      - stats-db
+      stats-db:
+        condition: service_healthy
     ports:
       - "9090:9090"
     environment:
@@ -54,8 +57,10 @@ services:
     build: ./ewm-main-service
     container_name: ewm-main
     depends_on:
-      - ewm-main-db
-      - stats-server
+      ewm-main-db:
+        condition: service_healthy
+      stats-server:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
