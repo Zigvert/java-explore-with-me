@@ -19,8 +19,7 @@ services:
     build: ./ewm-stats-service
     container_name: ewm-stats-server
     depends_on:
-      stats-db:
-        condition: service_healthy
+      - stats-db
     ports:
       - "9090:9090"
     environment:
@@ -33,7 +32,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 40s
+      start_period: 60s
 
   ewm-main-db:
     image: postgres:16.1
@@ -55,10 +54,8 @@ services:
     build: ./ewm-main-service
     container_name: ewm-main
     depends_on:
-      ewm-main-db:
-        condition: service_healthy
-      stats-server:
-        condition: service_healthy
+      - ewm-main-db
+      - stats-server
     ports:
       - "8080:8080"
     environment:
