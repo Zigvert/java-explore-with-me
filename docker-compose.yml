@@ -15,7 +15,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 15s
 
   stats-server:
     build: ./ewm-stats-service
@@ -35,7 +35,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 60s
+      start_period: 120s  # больше времени на старт приложения
 
   ewm-main-db:
     image: postgres:16.1
@@ -51,7 +51,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 15s
 
   ewm-main:
     build: ./ewm-main-service
@@ -74,4 +74,4 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 40s
+      start_period: 120s  # больше времени на старт приложения
