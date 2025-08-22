@@ -18,3 +18,15 @@ server:
 stats:
   service:
     url: ${STATS_SERVICE_URL:http://stats-server:9090}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info  # можно добавить: metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  server:
+    port: 8080
+
