@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: ewm_stats_db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -19,11 +19,12 @@ services:
 
   stats-server:
     build:
-      context: .
-      dockerfile: ewm-stats-service/Dockerfile
+      context: ./ewm-stats-service
+      dockerfile: Dockerfile
     container_name: ewm-stats-server
     depends_on:
-      - stats-db
+      stats-db:
+        condition: service_healthy
     ports:
       - "9090:9090"
     environment:
@@ -48,7 +49,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: ewm_main_db
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -p 5432"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -p 5432"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -56,12 +57,14 @@ services:
 
   ewm-main:
     build:
-      context: .
-      dockerfile: ewm-main-service/Dockerfile
+      context: ./ewm-main-service
+      dockerfile: Dockerfile
     container_name: ewm-main
     depends_on:
-      - ewm-main-db
-      - stats-server
+      ewm-main-db:
+        condition: service_healthy
+      stats-server:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
