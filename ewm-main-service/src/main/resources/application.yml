@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/ewm
+    username: user
+    password: password
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,7 +17,7 @@ server:
 
 stats:
   service:
-    url: ${STATS_SERVICE_URL}
+    url: http://localhost:9090
 
 management:
   endpoints:
