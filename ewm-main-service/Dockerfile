@@ -4,7 +4,7 @@ FROM amazoncorretto:21-alpine
 RUN apk add --no-cache bash curl
 
 # Копируем собранный jar
-COPY ewm-main-service/target/*.jar /app.jar
+COPY target/*.jar app.jar
 
 # Копируем скрипт ожидания БД
 COPY .github/workflows/wait-for-it.sh /wait-for-it.sh
