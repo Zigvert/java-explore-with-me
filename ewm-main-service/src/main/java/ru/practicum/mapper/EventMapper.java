@@ -7,51 +7,62 @@ import ru.practicum.model.Event;
 import ru.practicum.model.EventStatus;
 import ru.practicum.model.User;
 
-import java.time.LocalDateTime;
-
 @Component
 public class EventMapper {
 
     public EventDto toDto(Event event) {
-        return EventDto.builder()
-                .id(event.getId())
-                .title(event.getTitle())
-                .description(event.getDescription())
-                .annotation(event.getAnnotation())
-                .categoryId(event.getCategory() != null ? event.getCategory().getId() : null)
-                .initiatorId(event.getInitiator() != null ? event.getInitiator().getId() : null)
-                .eventDate(event.getEventDate())
-                .status(event.getStatus() != null ? event.getStatus().name() : null)
-                .isPaid(event.isPaid())
-                .participantLimit(event.getParticipantLimit())
-                .requestModeration(event.isRequestModeration())
-                .createdOn(event.getCreatedAt())
-                .publishedOn(event.getPublishedAt())
-                .location(event.getLocation() != null ?
-                        EventDto.LocationDto.builder()
-                                .lat(event.getLocation().getLat())
-                                .lon(event.getLocation().getLon())
-                                .build() : null)
-                .build();
+        EventDto dto = new EventDto();
+        dto.setId(event.getId());
+        dto.setTitle(event.getTitle());
+        dto.setAnnotation(event.getAnnotation());
+        dto.setDescription(event.getDescription());
+        dto.setCategoryId(event.getCategory() != null ? event.getCategory().getId() : null);
+        dto.setInitiatorId(event.getInitiator() != null ? event.getInitiator().getId() : null);
+        dto.setEventDate(event.getEventDate());
+        dto.setStatus(event.getStatus() != null ? event.getStatus().name() : null);
+        dto.setPaid(event.isPaid());
+        dto.setParticipantLimit(event.getParticipantLimit());
+        dto.setRequestModeration(event.isRequestModeration());
+        dto.setCreatedOn(event.getCreatedAt());
+        dto.setPublishedOn(event.getPublishedAt());
+        if (event.getLocation() != null) {
+            dto.setLocation(new EventDto.LocationDto(event.getLocation().getLat(), event.getLocation().getLon()));
+        }
+        return dto;
     }
 
-    public Event toEntity(EventDto dto, Category category, User initiator) {
-        return Event.builder()
-                .id(dto.getId())
-                .title(dto.getTitle())
-                .description(dto.getDescription())
-                .annotation(dto.getAnnotation())
-                .category(category)
-                .initiator(initiator)
-                .eventDate(dto.getEventDate())
-                .status(dto.getStatus() != null ? EventStatus.valueOf(dto.getStatus()) : EventStatus.PENDING)
-                .isPaid(dto.isPaid())
-                .participantLimit(dto.getParticipantLimit())
-                .requestModeration(dto.isRequestModeration())
-                .createdAt(dto.getCreatedOn() != null ? dto.getCreatedOn() : LocalDateTime.now())
-                .publishedAt(dto.getPublishedOn())
-                .location(dto.getLocation() != null ?
-                        new Event.Location(dto.getLocation().getLat(), dto.getLocation().getLon()) : null)
-                .build();
+    /** Для создания нового события (User/Category подтянет сервис) */
+    public Event toEntityForCreate(EventDto dto) {
+        Event event = new Event();
+        event.setTitle(dto.getTitle());
+        event.setAnnotation(dto.getAnnotation());
+        event.setDescription(dto.getDescription());
+        event.setEventDate(dto.getEventDate());
+        event.setPaid(dto.isPaid());
+        event.setParticipantLimit(dto.getParticipantLimit());
+        event.setRequestModeration(dto.isRequestModeration());
+        if (dto.getLocation() != null) {
+            event.setLocation(new Event.Location(dto.getLocation().getLat(), dto.getLocation().getLon()));
+        }
+        return event;
+    }
+
+    /** Для обновления события */
+    public void updateEntityFromDto(EventDto dto, Event event) {
+        if (dto.getTitle() != null) event.setTitle(dto.getTitle());
+        if (dto.getAnnotation() != null) event.setAnnotation(dto.getAnnotation());
+        if (dto.getDescription() != null) event.setDescription(dto.getDescription());
+        if (dto.getEventDate() != null) event.setEventDate(dto.getEventDate());
+        if (dto.getStatus() != null) {
+            try {
+                event.setStatus(EventStatus.valueOf(dto.getStatus()));
+            } catch (IllegalArgumentException ignored) {}
+        }
+        event.setPaid(dto.isPaid());
+        event.setParticipantLimit(dto.getParticipantLimit());
+        event.setRequestModeration(dto.isRequestModeration());
+        if (dto.getLocation() != null) {
+            event.setLocation(new Event.Location(dto.getLocation().getLat(), dto.getLocation().getLon()));
+        }
     }
 }
