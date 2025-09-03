@@ -29,7 +29,6 @@ public class EventService {
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
 
-    // -------- Создание события ----------
     @Transactional
     public Event create(EventDto dto, Long userId, Long categoryId) {
         User initiator = userRepository.findById(userId)
@@ -41,17 +40,15 @@ public class EventService {
         Event event = eventMapper.toEntityForCreate(dto);
         event.setInitiator(initiator);
         event.setCategory(category);
-        event.setViews(0L); // Инициализация просмотров
-        event.setConfirmedRequests(0); // Инициализация подтверждённых запросов
-
-        validateEvent(event);
+        event.setViews(0L);
+        event.setConfirmedRequests(0);
         event.setCreatedAt(LocalDateTime.now());
         event.setStatus(EventStatus.PENDING);
 
+        validateEvent(event);
         return eventRepository.save(event);
     }
 
-    // -------- Получение всех опубликованных ----------
     @Transactional(readOnly = true)
     public List<Event> getAll(String text,
                               List<Long> categoryIds,
@@ -74,7 +71,6 @@ public class EventService {
         }
 
         Pageable pageable = PageRequest.of(page, size, sortOption);
-
         LocalDateTime start = rangeStart != null ? rangeStart : LocalDateTime.now();
         LocalDateTime end = rangeEnd != null ? rangeEnd : LocalDateTime.now().plusYears(50);
 
@@ -90,7 +86,6 @@ public class EventService {
         );
     }
 
-    // -------- Получение одного опубликованного ----------
     @Transactional
     public Event getById(Long id) {
         Event event = eventRepository.findById(id)
@@ -99,11 +94,11 @@ public class EventService {
         if (event.getStatus() != EventStatus.PUBLISHED) {
             throw new EntityNotFoundException("Event is not published: " + id);
         }
-        event.setViews(event.getViews() + 1); // Инкремент просмотров
+
+        event.setViews(event.getViews() + 1);
         return eventRepository.save(event);
     }
 
-    // -------- Получение событий пользователя ----------
     @Transactional(readOnly = true)
     public List<Event> getUserEvents(Long userId, int from, int size) {
         userRepository.findById(userId)
@@ -115,7 +110,6 @@ public class EventService {
         return eventRepository.findByInitiatorId(userId, pageable);
     }
 
-    // -------- Обновление пользователем ----------
     @Transactional
     public Event updateUserEvent(Long userId, Long eventId, EventDto dto) {
         userRepository.findById(userId)
@@ -143,7 +137,6 @@ public class EventService {
         return eventRepository.save(existingEvent);
     }
 
-    // -------- Обновление администратором ----------
     @Transactional
     public Event updateAdminEvent(Long eventId, EventDto dto) {
         Event event = eventRepository.findById(eventId)
@@ -159,21 +152,23 @@ public class EventService {
 
         validateEvent(event);
 
-        if (dto.getStatus() != null && EventStatus.PUBLISHED.name().equals(dto.getStatus())) {
-            if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
-                throw new IllegalArgumentException("Published event date must be at least 1 hour in the future");
+        if (dto.getStatus() != null) {
+            if (EventStatus.PUBLISHED.name().equals(dto.getStatus())) {
+                if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
+                    throw new IllegalArgumentException("Published event date must be at least 1 hour in the future");
+                }
+                if (event.getPublishedAt() == null) {
+                    event.setPublishedAt(LocalDateTime.now());
+                }
+                event.setStatus(EventStatus.PUBLISHED);
+            } else if (EventStatus.CANCELED.name().equals(dto.getStatus())) {
+                event.setStatus(EventStatus.CANCELED);
             }
-            if (event.getPublishedAt() == null) {
-                event.setPublishedAt(LocalDateTime.now());
-            }
-        } else if (dto.getStatus() != null && EventStatus.CANCELED.name().equals(dto.getStatus())) {
-            event.setStatus(EventStatus.CANCELED);
         }
 
         return eventRepository.save(event);
     }
 
-    // -------- Проверки ----------
     private void validateEvent(Event event) {
         if (event.getEventDate() != null &&
                 event.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {

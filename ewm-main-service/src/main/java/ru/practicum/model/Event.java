@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Event {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,11 +35,11 @@ public class Event {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User initiator;
 
@@ -46,6 +47,7 @@ public class Event {
     @Column(nullable = false)
     private LocalDateTime eventDate;
 
+    @NotNull
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -55,20 +57,20 @@ public class Event {
     @Column(nullable = false)
     private EventStatus status;
 
-    @Column(name = "is_paid", nullable = false)
+    @Column(nullable = false)
     private boolean paid;
 
     @PositiveOrZero(message = "Participant limit cannot be negative")
-    @Column(name = "participant_limit", nullable = false)
+    @Column(nullable = false)
     private int participantLimit;
 
     @Column(name = "request_moderation", nullable = false)
     private boolean requestModeration;
 
-    @Column(name = "views", nullable = false)
+    @Column(nullable = false)
     private Long views = 0L;
 
-    @Column(name = "confirmed_requests", nullable = false)
+    @Column(nullable = false)
     private Integer confirmedRequests = 0;
 
     @Embedded
