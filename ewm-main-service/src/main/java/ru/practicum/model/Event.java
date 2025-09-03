@@ -19,17 +19,19 @@ public class Event {
 
     @NotBlank(message = "Title cannot be blank")
     @Size(min = 3, max = 120)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 120)
     private String title;
 
     @NotBlank(message = "Annotation cannot be blank")
     @Size(min = 20, max = 2000)
-    @Column(nullable = false)
+    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String annotation;
 
     @NotBlank(message = "Description cannot be blank")
     @Size(min = 20, max = 7000)
-    @Column(nullable = false)
+    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne
@@ -53,21 +55,21 @@ public class Event {
     @Column(nullable = false)
     private EventStatus status;
 
-    @Column(name = "is_paid")
+    @Column(name = "is_paid", nullable = false)
     private boolean paid;
 
     @PositiveOrZero(message = "Participant limit cannot be negative")
-    @Column(name = "participant_limit")
+    @Column(name = "participant_limit", nullable = false)
     private int participantLimit;
 
-    @Column(name = "request_moderation")
+    @Column(name = "request_moderation", nullable = false)
     private boolean requestModeration;
 
-    @Column(name = "views")
-    private Long views;
+    @Column(name = "views", nullable = false)
+    private Long views = 0L;
 
-    @Column(name = "confirmed_requests")
-    private Integer confirmedRequests;
+    @Column(name = "confirmed_requests", nullable = false)
+    private Integer confirmedRequests = 0;
 
     @Embedded
     private Location location;
