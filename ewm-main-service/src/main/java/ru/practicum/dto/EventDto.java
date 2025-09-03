@@ -35,11 +35,13 @@ public class EventDto {
 
     private String status;
 
-    private Boolean isPaid;
+    // Lombok сгенерирует getPaid() / setPaid()
+    private Boolean paid;
 
     @PositiveOrZero(message = "Participant limit cannot be negative")
     private Integer participantLimit;
 
+    // Lombok сгенерирует getRequestModeration() / setRequestModeration()
     private Boolean requestModeration;
 
     private LocalDateTime createdOn;

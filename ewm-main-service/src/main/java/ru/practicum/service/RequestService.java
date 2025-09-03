@@ -7,7 +7,9 @@ import jakarta.persistence.EntityNotFoundException;
 import ru.practicum.dto.RequestDto;
 import ru.practicum.mapper.RequestMapper;
 import ru.practicum.model.Event;
+import ru.practicum.model.EventStatus;
 import ru.practicum.model.ParticipationRequest;
+import ru.practicum.model.RequestStatus;
 import ru.practicum.model.User;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.RequestRepository;
@@ -39,7 +41,7 @@ public class RequestService {
             throw new IllegalArgumentException("Event is not published: " + eventId);
         }
         if (event.getParticipantLimit() > 0) {
-            long confirmedRequests = requestRepository.countByEventIdAndStatus(eventId, ParticipationRequest.RequestStatus.CONFIRMED);
+            long confirmedRequests = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED);
             if (confirmedRequests >= event.getParticipantLimit()) {
                 throw new IllegalArgumentException("Participant limit reached for event: " + eventId);
             }
@@ -49,12 +51,12 @@ public class RequestService {
                 .event(event)
                 .requester(requester)
                 .created(LocalDateTime.now())
-                .status(event.getParticipantLimit() == 0 || !event.isRequestModeration() ?
-                        ParticipationRequest.RequestStatus.CONFIRMED :
-                        ParticipationRequest.RequestStatus.PENDING)
+                .status(event.getParticipantLimit() == 0 || !event.isRequestModeration()
+                        ? RequestStatus.CONFIRMED
+                        : RequestStatus.PENDING)
                 .build();
 
-        if (request.getStatus() == ParticipationRequest.RequestStatus.CONFIRMED) {
+        if (request.getStatus() == RequestStatus.CONFIRMED) {
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
             eventRepository.save(event);
         }
@@ -82,13 +84,13 @@ public class RequestService {
             throw new IllegalArgumentException("User is not the requester: " + requestId);
         }
 
-        request.setStatus(ParticipationRequest.RequestStatus.CANCELED);
-        if (request.getStatus() == ParticipationRequest.RequestStatus.CONFIRMED) {
+        if (request.getStatus() == RequestStatus.CONFIRMED) {
             Event event = request.getEvent();
             event.setConfirmedRequests(event.getConfirmedRequests() - 1);
             eventRepository.save(event);
         }
 
+        request.setStatus(RequestStatus.CANCELED);
         return requestMapper.toDto(requestRepository.save(request));
     }
 }

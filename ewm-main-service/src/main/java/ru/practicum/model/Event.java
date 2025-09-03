@@ -54,7 +54,7 @@ public class Event {
     private EventStatus status;
 
     @Column(name = "is_paid")
-    private boolean isPaid;
+    private boolean paid;
 
     @PositiveOrZero(message = "Participant limit cannot be negative")
     @Column(name = "participant_limit")

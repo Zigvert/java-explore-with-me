@@ -5,7 +5,6 @@ import ru.practicum.dto.EventDto;
 import ru.practicum.model.Category;
 import ru.practicum.model.Event;
 import ru.practicum.model.EventStatus;
-import ru.practicum.model.User;
 
 @Component
 public class EventMapper {
@@ -28,7 +27,10 @@ public class EventMapper {
         dto.setViews(event.getViews());
         dto.setConfirmedRequests(event.getConfirmedRequests());
         if (event.getLocation() != null) {
-            dto.setLocation(new EventDto.LocationDto(event.getLocation().getLat(), event.getLocation().getLon()));
+            dto.setLocation(new EventDto.LocationDto(
+                    event.getLocation().getLat(),
+                    event.getLocation().getLon()
+            ));
         }
         return dto;
     }
@@ -39,11 +41,14 @@ public class EventMapper {
         event.setAnnotation(dto.getAnnotation());
         event.setDescription(dto.getDescription());
         event.setEventDate(dto.getEventDate());
-        event.setPaid(dto.isPaid() != null ? dto.isPaid() : false);
+        event.setPaid(dto.getPaid() != null ? dto.getPaid() : false);
         event.setParticipantLimit(dto.getParticipantLimit() != null ? dto.getParticipantLimit() : 0);
-        event.setRequestModeration(dto.isRequestModeration() != null ? dto.isRequestModeration() : true);
+        event.setRequestModeration(dto.getRequestModeration() != null ? dto.getRequestModeration() : true);
         if (dto.getLocation() != null) {
-            event.setLocation(new Event.Location(dto.getLocation().getLat(), dto.getLocation().getLon()));
+            event.setLocation(new Event.Location(
+                    dto.getLocation().getLat(),
+                    dto.getLocation().getLon()
+            ));
         }
         return event;
     }
@@ -59,11 +64,14 @@ public class EventMapper {
             } catch (IllegalArgumentException ignored) {
             }
         }
-        if (dto.isPaid() != null) event.setPaid(dto.isPaid());
+        if (dto.getPaid() != null) event.setPaid(dto.getPaid());
         if (dto.getParticipantLimit() != null) event.setParticipantLimit(dto.getParticipantLimit());
-        if (dto.isRequestModeration() != null) event.setRequestModeration(dto.isRequestModeration());
+        if (dto.getRequestModeration() != null) event.setRequestModeration(dto.getRequestModeration());
         if (dto.getLocation() != null) {
-            event.setLocation(new Event.Location(dto.getLocation().getLat(), dto.getLocation().getLon()));
+            event.setLocation(new Event.Location(
+                    dto.getLocation().getLat(),
+                    dto.getLocation().getLon()
+            ));
         }
     }
 }
