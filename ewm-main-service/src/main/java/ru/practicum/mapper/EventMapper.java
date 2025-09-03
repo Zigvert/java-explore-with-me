@@ -25,29 +25,29 @@ public class EventMapper {
         dto.setRequestModeration(event.isRequestModeration());
         dto.setCreatedOn(event.getCreatedAt());
         dto.setPublishedOn(event.getPublishedAt());
+        dto.setViews(event.getViews());
+        dto.setConfirmedRequests(event.getConfirmedRequests());
         if (event.getLocation() != null) {
             dto.setLocation(new EventDto.LocationDto(event.getLocation().getLat(), event.getLocation().getLon()));
         }
         return dto;
     }
 
-    /** Для создания нового события (User/Category подтянет сервис) */
     public Event toEntityForCreate(EventDto dto) {
         Event event = new Event();
         event.setTitle(dto.getTitle());
         event.setAnnotation(dto.getAnnotation());
         event.setDescription(dto.getDescription());
         event.setEventDate(dto.getEventDate());
-        event.setPaid(dto.isPaid());
-        event.setParticipantLimit(dto.getParticipantLimit());
-        event.setRequestModeration(dto.isRequestModeration());
+        event.setPaid(dto.isPaid() != null ? dto.isPaid() : false);
+        event.setParticipantLimit(dto.getParticipantLimit() != null ? dto.getParticipantLimit() : 0);
+        event.setRequestModeration(dto.isRequestModeration() != null ? dto.isRequestModeration() : true);
         if (dto.getLocation() != null) {
             event.setLocation(new Event.Location(dto.getLocation().getLat(), dto.getLocation().getLon()));
         }
         return event;
     }
 
-    /** Для обновления события */
     public void updateEntityFromDto(EventDto dto, Event event) {
         if (dto.getTitle() != null) event.setTitle(dto.getTitle());
         if (dto.getAnnotation() != null) event.setAnnotation(dto.getAnnotation());
@@ -56,11 +56,12 @@ public class EventMapper {
         if (dto.getStatus() != null) {
             try {
                 event.setStatus(EventStatus.valueOf(dto.getStatus()));
-            } catch (IllegalArgumentException ignored) {}
+            } catch (IllegalArgumentException ignored) {
+            }
         }
-        event.setPaid(dto.isPaid());
-        event.setParticipantLimit(dto.getParticipantLimit());
-        event.setRequestModeration(dto.isRequestModeration());
+        if (dto.isPaid() != null) event.setPaid(dto.isPaid());
+        if (dto.getParticipantLimit() != null) event.setParticipantLimit(dto.getParticipantLimit());
+        if (dto.isRequestModeration() != null) event.setRequestModeration(dto.isRequestModeration());
         if (dto.getLocation() != null) {
             event.setLocation(new Event.Location(dto.getLocation().getLat(), dto.getLocation().getLon()));
         }

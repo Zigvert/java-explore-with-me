@@ -63,6 +63,12 @@ public class Event {
     @Column(name = "request_moderation")
     private boolean requestModeration;
 
+    @Column(name = "views")
+    private Long views;
+
+    @Column(name = "confirmed_requests")
+    private Integer confirmedRequests;
+
     @Embedded
     private Location location;
 

@@ -41,6 +41,8 @@ public class EventService {
         Event event = eventMapper.toEntityForCreate(dto);
         event.setInitiator(initiator);
         event.setCategory(category);
+        event.setViews(0L); // Инициализация просмотров
+        event.setConfirmedRequests(0); // Инициализация подтверждённых запросов
 
         validateEvent(event);
         event.setCreatedAt(LocalDateTime.now());
@@ -66,7 +68,7 @@ public class EventService {
         if ("EVENT_DATE".equalsIgnoreCase(sort)) {
             sortOption = Sort.by("eventDate").ascending();
         } else if ("VIEWS".equalsIgnoreCase(sort)) {
-            sortOption = Sort.by("id").descending(); // TODO: заменить на сортировку по просмотрам
+            sortOption = Sort.by("views").descending();
         } else {
             sortOption = Sort.unsorted();
         }
@@ -78,7 +80,7 @@ public class EventService {
 
         return eventRepository.findEvents(
                 EventStatus.PUBLISHED,
-                text,
+                text != null ? text.toLowerCase() : null,
                 categoryIds,
                 paid,
                 start,
@@ -89,7 +91,7 @@ public class EventService {
     }
 
     // -------- Получение одного опубликованного ----------
-    @Transactional(readOnly = true)
+    @Transactional
     public Event getById(Long id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found: " + id));
@@ -97,7 +99,8 @@ public class EventService {
         if (event.getStatus() != EventStatus.PUBLISHED) {
             throw new EntityNotFoundException("Event is not published: " + id);
         }
-        return event;
+        event.setViews(event.getViews() + 1); // Инкремент просмотров
+        return eventRepository.save(event);
     }
 
     // -------- Получение событий пользователя ----------
@@ -128,7 +131,6 @@ public class EventService {
             throw new IllegalArgumentException("Cannot update published event: " + eventId);
         }
 
-        // применяем изменения
         eventMapper.updateEntityFromDto(dto, existingEvent);
 
         if (dto.getCategoryId() != null) {
@@ -157,13 +159,15 @@ public class EventService {
 
         validateEvent(event);
 
-        if (event.getStatus() == EventStatus.PUBLISHED) {
+        if (dto.getStatus() != null && EventStatus.PUBLISHED.name().equals(dto.getStatus())) {
             if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
                 throw new IllegalArgumentException("Published event date must be at least 1 hour in the future");
             }
             if (event.getPublishedAt() == null) {
                 event.setPublishedAt(LocalDateTime.now());
             }
+        } else if (dto.getStatus() != null && EventStatus.CANCELED.name().equals(dto.getStatus())) {
+            event.setStatus(EventStatus.CANCELED);
         }
 
         return eventRepository.save(event);

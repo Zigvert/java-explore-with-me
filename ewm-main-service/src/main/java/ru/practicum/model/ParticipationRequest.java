@@ -2,11 +2,10 @@ package ru.practicum.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "participation_requests")
+@Table(name = "requests")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,13 +19,13 @@ public class ParticipationRequest {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
+    @ManyToOne
+    @JoinColumn(name = "requester_id", nullable = false)
+    private User requester;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RequestStatus status;  // Предполагаемый enum, см. ниже
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User requester;  // Пользователь, отправивший запрос
+    private RequestStatus status;
 
     @Column(nullable = false)
     private LocalDateTime created;

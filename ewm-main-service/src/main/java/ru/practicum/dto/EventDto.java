@@ -35,15 +35,18 @@ public class EventDto {
 
     private String status;
 
-    private boolean isPaid;
+    private Boolean isPaid;
 
     @PositiveOrZero(message = "Participant limit cannot be negative")
-    private int participantLimit;
+    private Integer participantLimit;
 
-    private boolean requestModeration;
+    private Boolean requestModeration;
 
     private LocalDateTime createdOn;
     private LocalDateTime publishedOn;
+
+    private Long views;
+    private Integer confirmedRequests;
 
     private LocationDto location;
 
