@@ -18,21 +18,19 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Title cannot be blank")
-    @Size(min = 3, max = 120)
+    @NotBlank(message = "Название события не может быть пустым")
+    @Size(min = 3, max = 120, message = "Название события должно быть от 3 до 120 символов")
     @Column(nullable = false, length = 120)
     private String title;
 
-    @NotBlank(message = "Annotation cannot be blank")
-    @Size(min = 20, max = 2000)
-    @Lob
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @NotBlank(message = "Аннотация не может быть пустой")
+    @Size(min = 20, max = 2000, message = "Аннотация должна быть от 20 до 2000 символов")
+    @Column(nullable = false, length = 2000)
     private String annotation;
 
-    @NotBlank(message = "Description cannot be blank")
-    @Size(min = 20, max = 7000)
-    @Lob
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @NotBlank(message = "Описание не может быть пустым")
+    @Size(min = 20, max = 7000, message = "Описание должно быть от 20 до 7000 символов")
+    @Column(nullable = false, length = 7000) // ИЗМЕНЕНО: используем length вместо columnDefinition
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,48 +41,37 @@ public class Event {
     @JoinColumn(name = "user_id", nullable = false)
     private User initiator;
 
-    @NotNull(message = "Event date cannot be null")
-    @Column(nullable = false)
+    @NotNull(message = "Дата события не может быть пустой")
+    @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
 
-    @NotNull
-    @Column(nullable = false)
+    @NotNull(message = "Дата создания не может быть пустой")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private EventStatus status;
 
-    @Column(nullable = false)
+    @Column(name = "is_paid", nullable = false)
     private boolean paid;
 
-    @PositiveOrZero(message = "Participant limit cannot be negative")
-    @Column(nullable = false)
+    @PositiveOrZero(message = "Лимит участников не может быть отрицательным")
+    @Column(name = "participant_limit", nullable = false)
     private int participantLimit;
 
     @Column(name = "request_moderation", nullable = false)
     private boolean requestModeration;
 
-    @Column(nullable = false)
+    @Column(name = "views", nullable = false)
     private Long views = 0L;
 
-    @Column(nullable = false)
+    @Column(name = "confirmed_requests", nullable = false)
     private Integer confirmedRequests = 0;
 
     @Embedded
     private Location location;
-
-    @Embeddable
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Location {
-        @NotNull
-        private Float lat;
-
-        @NotNull
-        private Float lon;
-    }
 }

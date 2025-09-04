@@ -1,11 +1,11 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ewm
-    username: user
-    password: password
+    url: jdbc:postgresql://ewm-main-db:5432/ewm
+    username: ${DB_USERNAME:user}
+    password: ${DB_PASSWORD:password}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate # Используйте 'update' для разработки, 'validate' для продакшена
     show-sql: true
     open-in-view: false
 
@@ -15,7 +15,7 @@ server:
 
 stats:
   service:
-    url: http://localhost:9090
+    url: http://stats-service:9090
 
 management:
   endpoints:
@@ -27,3 +27,8 @@ management:
       show-details: always
   server:
     port: 8080
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE

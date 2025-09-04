@@ -2,6 +2,7 @@ package ru.practicum.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,6 +16,13 @@ public class ParticipationRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "created", nullable = false)
+    private LocalDateTime created;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private RequestStatus status; // PENDING, CONFIRMED, REJECTED, CANCELED
+
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
@@ -22,11 +30,4 @@ public class ParticipationRequest {
     @ManyToOne
     @JoinColumn(name = "requester_id", nullable = false)
     private User requester;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RequestStatus status;
-
-    @Column(nullable = false)
-    private LocalDateTime created;
 }

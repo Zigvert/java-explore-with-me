@@ -5,6 +5,9 @@ import ru.practicum.dto.EventDto;
 import ru.practicum.model.Category;
 import ru.practicum.model.Event;
 import ru.practicum.model.EventStatus;
+import ru.practicum.model.Location; // 🆕 правильный импорт
+
+import java.time.LocalDateTime;   // 🆕 добавляем импорт
 
 @Component
 public class EventMapper {
@@ -44,8 +47,13 @@ public class EventMapper {
         event.setPaid(dto.getPaid() != null ? dto.getPaid() : false);
         event.setParticipantLimit(dto.getParticipantLimit() != null ? dto.getParticipantLimit() : 0);
         event.setRequestModeration(dto.getRequestModeration() != null ? dto.getRequestModeration() : true);
+
+        // дефолты
+        event.setCreatedAt(LocalDateTime.now());
+        event.setStatus(EventStatus.PENDING);
+
         if (dto.getLocation() != null) {
-            event.setLocation(new Event.Location(
+            event.setLocation(new Location(   // 🆕 теперь правильный класс
                     dto.getLocation().getLat(),
                     dto.getLocation().getLon()
             ));
@@ -61,14 +69,13 @@ public class EventMapper {
         if (dto.getStatus() != null) {
             try {
                 event.setStatus(EventStatus.valueOf(dto.getStatus()));
-            } catch (IllegalArgumentException ignored) {
-            }
+            } catch (IllegalArgumentException ignored) {}
         }
         if (dto.getPaid() != null) event.setPaid(dto.getPaid());
         if (dto.getParticipantLimit() != null) event.setParticipantLimit(dto.getParticipantLimit());
         if (dto.getRequestModeration() != null) event.setRequestModeration(dto.getRequestModeration());
         if (dto.getLocation() != null) {
-            event.setLocation(new Event.Location(
+            event.setLocation(new Location(   // 🆕 тоже поправлено
                     dto.getLocation().getLat(),
                     dto.getLocation().getLon()
             ));
