@@ -20,12 +20,13 @@ public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
+    private final CompilationMapper compilationMapper; // ✅ внедряем бин
 
     @Override
     public CompilationDto create(NewCompilationDto dto) {
         List<Event> events = eventRepository.findAllById(dto.getEvents());
-        Compilation compilation = CompilationMapper.fromNewDto(dto, events);
-        return CompilationMapper.toDto(compilationRepository.save(compilation));
+        Compilation compilation = compilationMapper.fromNewDto(dto, events);
+        return compilationMapper.toDto(compilationRepository.save(compilation));
     }
 
     @Override
@@ -36,8 +37,8 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto getById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new RuntimeException("Compilation not found"));
-        return CompilationMapper.toDto(compilation);
+                .orElseThrow(() -> new RuntimeException("Compilation not found: " + compId));
+        return compilationMapper.toDto(compilation);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class CompilationServiceImpl implements CompilationService {
         }
 
         return compilations.stream()
-                .map(CompilationMapper::toDto)
+                .map(compilationMapper::toDto) // ✅ через бин
                 .collect(Collectors.toList());
     }
 }
