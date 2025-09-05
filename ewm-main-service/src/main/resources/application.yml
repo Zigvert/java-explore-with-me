@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://ewm-main-db:5432/ewm
+    url: jdbc:postgresql://localhost:5432/ewm
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -20,7 +20,7 @@ server:
 
 stats:
   service:
-    url: http://stats-service:9090
+    url: http://localhost:9090
 
 management:
   endpoints:
