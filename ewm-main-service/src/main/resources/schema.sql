@@ -111,9 +111,9 @@ INSERT INTO categories (id, name) VALUES
 -- ========================================
 INSERT INTO events (id, title, annotation, description, category_id, user_id, event_date, created_at, status, is_paid, participant_limit, request_moderation, views, confirmed_requests, lat, lon)
 VALUES
-(1, 'Rock Concert', 'Awesome rock concert coming soon', 'Full description of rock concert event goes here, more than 20 chars', 1, 1, NOW() + interval '1 day', NOW(), 'PENDING', false, 100, true, 0, 0, 55.75, 37.61),
-(2, 'Football Match', 'Exciting football match', 'Detailed description of football match, enough length', 2, 2, NOW() + interval '2 days', NOW(), 'PENDING', false, 50, true, 0, 0, 55.76, 37.62),
-(3, 'Theatre Play', 'Amazing theatre play', 'Full description of theatre play event, over 20 characters', 3, 3, NOW() + interval '3 days', NOW(), 'PENDING', true, 30, false, 0, 0, 55.77, 37.63);
+(1, 'Rock Concert', 'Awesome rock concert coming soon', 'Full description of rock concert event goes here, more than 20 chars', 1, 1, NOW() + interval '1 day', NOW(), 'PENDING', false, 100, true, 0, 0, 55.750000, 37.610000),
+(2, 'Football Match', 'Exciting football match', 'Detailed description of football match, enough length', 2, 2, NOW() + interval '2 days', NOW(), 'PENDING', false, 50, true, 0, 0, 55.760000, 37.620000),
+(3, 'Theatre Play', 'Amazing theatre play', 'Full description of theatre play event, over 20 characters', 3, 3, NOW() + interval '3 days', NOW(), 'PENDING', true, 30, false, 0, 0, 55.770000, 37.630000);
 
 -- ========================================
 -- Данные запросов на участие
