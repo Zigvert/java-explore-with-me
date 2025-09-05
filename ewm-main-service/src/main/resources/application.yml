@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ewm
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update # Для разработки; в проде лучше использовать 'validate'
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+    open-in-view: false
+
+server:
+  port: 8080
+  address: 0.0.0.0
+
+stats:
+  service:
+    url: http://localhost:9090
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+  server:
+    port: 8080
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
