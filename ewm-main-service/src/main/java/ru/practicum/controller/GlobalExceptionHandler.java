@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,7 +27,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
     }
 
-    // ---- 400 ----
+    // ---- 400 (валидация DTO) ----
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidation(MethodArgumentNotValidException e) {
@@ -38,10 +39,12 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
     }
 
+    // ---- 400 (невалидный запрос / параметры) ----
     @ExceptionHandler({
             IllegalArgumentException.class,
             ConstraintViolationException.class,
-            MissingServletRequestParameterException.class
+            MissingServletRequestParameterException.class,
+            HttpMessageNotReadableException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequest(Exception e) {
@@ -49,17 +52,18 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
 
+    // ---- 409 (конфликты БД, дубликаты, FK violation) ----
     @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleDataIntegrity(DataIntegrityViolationException e) {
         String message = e.getMostSpecificCause() != null
                 ? e.getMostSpecificCause().getMessage()
                 : e.getMessage();
         log.warn("Data integrity violation: {}", message);
-        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Database error: " + message);
+        return new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict: " + message);
     }
 
-    // ---- 500 ----
+    // ---- 500 (непредвиденные ошибки) ----
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleUnexpected(Exception e) {

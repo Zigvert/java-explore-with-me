@@ -5,8 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.NewCompilationDto;
+import ru.practicum.dto.UpdateCompilationRequest;
 import ru.practicum.service.CompilationService;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -15,6 +17,7 @@ public class CompilationController {
 
     private final CompilationService compilationService;
 
+    // ---- Публичные ----
     @GetMapping("/compilations")
     public List<CompilationDto> getAll(@RequestParam(required = false) Boolean pinned,
                                        @RequestParam(defaultValue = "0") int from,
@@ -27,10 +30,17 @@ public class CompilationController {
         return compilationService.getById(compId);
     }
 
+    // ---- Админские ----
     @PostMapping("/admin/compilations")
     @ResponseStatus(HttpStatus.CREATED)
-    public CompilationDto create(@RequestBody NewCompilationDto dto) {
+    public CompilationDto create(@Valid @RequestBody NewCompilationDto dto) {
         return compilationService.create(dto);
+    }
+
+    @PatchMapping("/admin/compilations/{compId}")
+    public CompilationDto update(@PathVariable Long compId,
+                                 @Valid @RequestBody UpdateCompilationRequest dto) {
+        return compilationService.update(compId, dto);
     }
 
     @DeleteMapping("/admin/compilations/{compId}")

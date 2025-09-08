@@ -1,6 +1,8 @@
 -- ========================================
 -- Очистка старых таблиц
 -- ========================================
+DROP TABLE IF EXISTS compilation_events;
+DROP TABLE IF EXISTS compilations;
 DROP TABLE IF EXISTS event_stats;
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS participation_requests;
@@ -22,7 +24,7 @@ CREATE TABLE users (
 -- ========================================
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL UNIQUE
 );
 
 -- ========================================
@@ -33,8 +35,8 @@ CREATE TABLE events (
     title VARCHAR(255) NOT NULL,
     annotation TEXT NOT NULL,
     description TEXT NOT NULL,
-    category_id INT NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
-    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    category_id INT NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     event_date TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     published_at TIMESTAMP,
@@ -83,8 +85,27 @@ CREATE TABLE event_stats (
 );
 
 -- ========================================
+-- Таблица подборок событий
+-- ========================================
+CREATE TABLE compilations (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    pinned BOOLEAN NOT NULL DEFAULT false
+);
+
+-- ========================================
+-- Связка подборки ↔ события (многие-ко-многим)
+-- ========================================
+CREATE TABLE compilation_events (
+    compilation_id INT NOT NULL REFERENCES compilations(id) ON DELETE CASCADE,
+    event_id INT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    PRIMARY KEY (compilation_id, event_id)
+);
+
+-- ========================================
 -- Индексы для ускорения поиска
 -- ========================================
 CREATE INDEX idx_events_category_id ON events(category_id);
 CREATE INDEX idx_events_event_date ON events(event_date);
 CREATE INDEX idx_events_status ON events(status);
+CREATE INDEX idx_compilations_pinned ON compilations(pinned);
