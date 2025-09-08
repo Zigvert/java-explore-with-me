@@ -1,3 +1,11 @@
 package ru.practicum.exception;
 
-public record ErrorResponse(int status, String message) {}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class ErrorResponse {
+    private int status;
+    private String message;
+}

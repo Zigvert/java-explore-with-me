@@ -14,5 +14,5 @@ public class NewCompilationDto {
     private String title;
 
     private Boolean pinned = false;
-    private List<Long> events = List.of(); // дефолт пустой список
+    private List<Long> events = List.of();
 }

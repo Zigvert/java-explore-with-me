@@ -54,7 +54,7 @@ public class CompilationServiceImpl implements CompilationService {
         List<Compilation> compilations = compilationRepository.findAll(page).getContent();
         if (pinned != null) {
             compilations = compilations.stream()
-                    .filter(c -> c.isPinned() == pinned)
+                    .filter(c -> Boolean.TRUE.equals(c.getPinned()) == pinned)
                     .collect(Collectors.toList());
         }
         return compilations.stream()

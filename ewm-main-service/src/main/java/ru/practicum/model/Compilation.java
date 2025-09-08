@@ -2,6 +2,7 @@ package ru.practicum.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -11,12 +12,14 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Compilation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
-    private boolean pinned;
+
+    private Boolean pinned = false;  // ✅ использовать Boolean вместо boolean
 
     @ManyToMany
     @JoinTable(
@@ -24,5 +27,6 @@ public class Compilation {
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id")
     )
-    private List<Event> events;
+    @Builder.Default
+    private List<Event> events = new ArrayList<>();  // ✅ инициализация пустым списком
 }

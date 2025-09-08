@@ -22,7 +22,7 @@ public class CompilationMapper {
         return CompilationDto.builder()
                 .id(compilation.getId())
                 .title(compilation.getTitle())
-                .pinned(compilation.isPinned())
+                .pinned(Boolean.TRUE.equals(compilation.getPinned()))
                 .events(compilation.getEvents() != null
                         ? compilation.getEvents().stream()
                         .map(eventMapper::toDto)

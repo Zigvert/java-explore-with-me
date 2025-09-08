@@ -17,9 +17,6 @@ public class CompilationController {
 
     private final CompilationService compilationService;
 
-    // ----------------------------
-    // Публичный эндпоинт: просмотр подборок
-    // ----------------------------
     @GetMapping("/compilations")
     public List<CompilationDto> getAll(
             @RequestParam(required = false) Boolean pinned,
@@ -28,28 +25,18 @@ public class CompilationController {
         return compilationService.getAll(pinned, from, size);
     }
 
-    // ----------------------------
-    // Админ: создание подборки
-    // ----------------------------
     @PostMapping("/admin/compilations")
     @ResponseStatus(HttpStatus.CREATED)
     public CompilationDto create(@Valid @RequestBody NewCompilationDto dto) {
         return compilationService.create(dto);
     }
 
-    // ----------------------------
-    // Админ: обновление подборки
-    // ----------------------------
     @PatchMapping("/admin/compilations/{compId}")
-    public CompilationDto update(
-            @PathVariable Long compId,
-            @RequestBody UpdateCompilationRequest request) {
+    public CompilationDto update(@PathVariable Long compId,
+                                 @RequestBody UpdateCompilationRequest request) {
         return compilationService.update(compId, request);
     }
 
-    // ----------------------------
-    // Админ: удаление подборки
-    // ----------------------------
     @DeleteMapping("/admin/compilations/{compId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long compId) {
