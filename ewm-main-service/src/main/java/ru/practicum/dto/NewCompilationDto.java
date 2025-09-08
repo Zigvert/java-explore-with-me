@@ -1,5 +1,6 @@
 package ru.practicum.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
@@ -9,7 +10,9 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class NewCompilationDto {
+    @NotBlank(message = "Title cannot be blank")
     private String title;
-    private boolean pinned;
-    private List<Long> events; // список id событий
+
+    private Boolean pinned = false;              // 🔹 по умолчанию false
+    private List<Long> events = List.of();       // 🔹 пустой список по умолчанию
 }

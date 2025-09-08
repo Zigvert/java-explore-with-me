@@ -27,14 +27,14 @@ public class CompilationMapper {
                         ? compilation.getEvents().stream()
                         .map(eventMapper::toDto)
                         .collect(Collectors.toList())
-                        : null)
+                        : List.of())
                 .build();
     }
 
     public Compilation fromNewDto(NewCompilationDto dto, List<Event> events) {
         return Compilation.builder()
                 .title(dto.getTitle())
-                .pinned(dto.isPinned())
+                .pinned(dto.getPinned())
                 .events(events)
                 .build();
     }

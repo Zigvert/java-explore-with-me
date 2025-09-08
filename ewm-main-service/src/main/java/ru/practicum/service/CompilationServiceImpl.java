@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.NewCompilationDto;
+import ru.practicum.dto.UpdateCompilationRequest;
 import ru.practicum.mapper.CompilationMapper;
 import ru.practicum.model.Compilation;
 import ru.practicum.model.Event;
@@ -20,11 +21,13 @@ public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
-    private final CompilationMapper compilationMapper; // ✅ внедряем бин
+    private final CompilationMapper compilationMapper;
 
     @Override
     public CompilationDto create(NewCompilationDto dto) {
-        List<Event> events = eventRepository.findAllById(dto.getEvents());
+        List<Event> events = dto.getEvents().isEmpty()
+                ? List.of()
+                : eventRepository.findAllById(dto.getEvents());
         Compilation compilation = compilationMapper.fromNewDto(dto, events);
         return compilationMapper.toDto(compilationRepository.save(compilation));
     }
@@ -45,17 +48,38 @@ public class CompilationServiceImpl implements CompilationService {
     public List<CompilationDto> getAll(Boolean pinned, int from, int size) {
         PageRequest page = PageRequest.of(from / size, size);
 
-        List<Compilation> compilations;
+        List<Compilation> compilations = compilationRepository.findAll(page).getContent();
+
         if (pinned != null) {
-            compilations = compilationRepository.findAll(page).stream()
-                    .filter(c -> c.isPinned() == pinned)
+            compilations = compilations.stream()
+                    .filter(c -> c.isPinned() == pinned) // 🔹 исправлено
                     .collect(Collectors.toList());
-        } else {
-            compilations = compilationRepository.findAll(page).getContent();
         }
 
         return compilations.stream()
-                .map(compilationMapper::toDto) // ✅ через бин
+                .map(compilationMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public CompilationDto update(Long compId, UpdateCompilationRequest request) {
+        Compilation compilation = compilationRepository.findById(compId)
+                .orElseThrow(() -> new RuntimeException("Compilation not found: " + compId));
+
+        if (request.getTitle() != null) {
+            compilation.setTitle(request.getTitle());
+        }
+        if (request.getPinned() != null) {
+            compilation.setPinned(request.getPinned());
+        }
+        if (request.getEvents() != null) {
+            List<Event> events = request.getEvents().isEmpty()
+                    ? List.of()
+                    : eventRepository.findAllById(request.getEvents());
+            compilation.setEvents(events);
+        }
+
+        return compilationMapper.toDto(compilationRepository.save(compilation));
     }
 }

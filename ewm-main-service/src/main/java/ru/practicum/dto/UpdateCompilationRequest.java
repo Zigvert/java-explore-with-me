@@ -1,18 +1,15 @@
 package ru.practicum.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UpdateCompilationRequest {
-    private String title;          // новое название
-    private Boolean pinned;        // закрепить/открепить
-    private Set<Long> events;      // список id событий
+    private String title;             // 🔹 может быть null → обновляем только если пришло
+    private Boolean pinned;           // 🔹 можно менять только pinned
+    private List<Long> events;        // 🔹 список новых событий
 }
