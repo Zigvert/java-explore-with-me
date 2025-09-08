@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.NewCompilationDto;
 import ru.practicum.dto.UpdateCompilationRequest;
+import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.CompilationMapper;
 import ru.practicum.model.Compilation;
 import ru.practicum.model.Event;
@@ -34,13 +35,16 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public void delete(Long compId) {
+        if (!compilationRepository.existsById(compId)) {
+            throw new NotFoundException("Compilation not found: " + compId);
+        }
         compilationRepository.deleteById(compId);
     }
 
     @Override
     public CompilationDto getById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new RuntimeException("Compilation not found: " + compId));
+                .orElseThrow(() -> new NotFoundException("Compilation not found: " + compId));
         return compilationMapper.toDto(compilation);
     }
 
@@ -52,7 +56,7 @@ public class CompilationServiceImpl implements CompilationService {
 
         if (pinned != null) {
             compilations = compilations.stream()
-                    .filter(c -> c.isPinned() == pinned) // 🔹 исправлено
+                    .filter(c -> c.isPinned() == pinned)
                     .collect(Collectors.toList());
         }
 
@@ -61,11 +65,10 @@ public class CompilationServiceImpl implements CompilationService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     public CompilationDto update(Long compId, UpdateCompilationRequest request) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new RuntimeException("Compilation not found: " + compId));
+                .orElseThrow(() -> new NotFoundException("Compilation not found: " + compId));
 
         if (request.getTitle() != null) {
             compilation.setTitle(request.getTitle());

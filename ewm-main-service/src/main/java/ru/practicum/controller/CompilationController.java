@@ -13,36 +13,44 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping
 public class CompilationController {
 
     private final CompilationService compilationService;
 
-    // ---- Публичные ----
+    // ----------------------------
+    // Получение всех подборок
+    // ----------------------------
     @GetMapping("/compilations")
-    public List<CompilationDto> getAll(@RequestParam(required = false) Boolean pinned,
-                                       @RequestParam(defaultValue = "0") int from,
-                                       @RequestParam(defaultValue = "10") int size) {
+    public List<CompilationDto> getAll(
+            @RequestParam(required = false) Boolean pinned,
+            @RequestParam(defaultValue = "0") int from,
+            @RequestParam(defaultValue = "10") int size) {
         return compilationService.getAll(pinned, from, size);
     }
 
-    @GetMapping("/compilations/{compId}")
-    public CompilationDto getById(@PathVariable Long compId) {
-        return compilationService.getById(compId);
-    }
-
-    // ---- Админские ----
+    // ----------------------------
+    // Создание подборки (админ)
+    // ----------------------------
     @PostMapping("/admin/compilations")
     @ResponseStatus(HttpStatus.CREATED)
     public CompilationDto create(@Valid @RequestBody NewCompilationDto dto) {
         return compilationService.create(dto);
     }
 
+    // ----------------------------
+    // Обновление подборки (админ)
+    // ----------------------------
     @PatchMapping("/admin/compilations/{compId}")
-    public CompilationDto update(@PathVariable Long compId,
-                                 @Valid @RequestBody UpdateCompilationRequest dto) {
-        return compilationService.update(compId, dto);
+    public CompilationDto update(
+            @PathVariable Long compId,
+            @RequestBody UpdateCompilationRequest request) {
+        return compilationService.update(compId, request);
     }
 
+    // ----------------------------
+    // Удаление подборки (админ)
+    // ----------------------------
     @DeleteMapping("/admin/compilations/{compId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long compId) {

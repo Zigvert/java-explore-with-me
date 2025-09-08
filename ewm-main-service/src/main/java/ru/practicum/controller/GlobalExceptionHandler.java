@@ -1,6 +1,5 @@
 package ru.practicum.controller;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,33 +12,35 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.exception.ErrorResponse;
+import ru.practicum.exception.NotFoundException;
+
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // ---- 404 ----
-    @ExceptionHandler(EntityNotFoundException.class)
+    // ---- 404 Not Found ----
+    @ExceptionHandler({jakarta.persistence.EntityNotFoundException.class, NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFound(EntityNotFoundException e) {
+    public ErrorResponse handleNotFound(Exception e) {
         log.warn("Entity not found: {}", e.getMessage());
         return new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
     }
 
-    // ---- 400 (валидация DTO) ----
+    // ---- 400 Bad Request (валидация DTO) ----
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidation(MethodArgumentNotValidException e) {
-        String errorMessage = e.getBindingResult().getFieldErrors().stream()
+        String errors = e.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .findFirst()
-                .orElse("Validation error");
-        log.warn("Validation failed: {}", errorMessage);
-        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
+                .collect(Collectors.joining("; "));
+        log.warn("Validation failed: {}", errors);
+        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errors);
     }
 
-    // ---- 400 (невалидный запрос / параметры) ----
+    // ---- 400 Bad Request (невалидные параметры) ----
     @ExceptionHandler({
             IllegalArgumentException.class,
             ConstraintViolationException.class,
@@ -52,7 +53,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
 
-    // ---- 409 (конфликты БД, дубликаты, FK violation) ----
+    // ---- 409 Conflict (конфликты БД) ----
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleDataIntegrity(DataIntegrityViolationException e) {
@@ -63,14 +64,13 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict: " + message);
     }
 
-    // ---- 500 (непредвиденные ошибки) ----
+    // ---- 500 Internal Server Error ----
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleUnexpected(Exception e) {
         log.error("Unexpected error", e);
-        return new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Unexpected error: " + e.getMessage()
-        );
+        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Unexpected error: " + e.getMessage());
     }
 }
+
