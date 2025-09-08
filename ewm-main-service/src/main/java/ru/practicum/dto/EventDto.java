@@ -1,5 +1,6 @@
 package ru.practicum.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -31,20 +32,22 @@ public class EventDto {
 
     @NotNull(message = "Event date cannot be null")
     @Future(message = "Event date must be in the future, at least 2 hours from now")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime eventDate;
 
     private String status;
 
-    // Lombok сгенерирует getPaid() / setPaid()
     private Boolean paid;
 
     @PositiveOrZero(message = "Participant limit cannot be negative")
     private Integer participantLimit;
 
-    // Lombok сгенерирует getRequestModeration() / setRequestModeration()
     private Boolean requestModeration;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdOn;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime publishedOn;
 
     private Long views;

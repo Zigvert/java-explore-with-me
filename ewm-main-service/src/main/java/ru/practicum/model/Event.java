@@ -1,5 +1,6 @@
 package ru.practicum.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -30,7 +31,7 @@ public class Event {
 
     @NotBlank(message = "Описание не может быть пустым")
     @Size(min = 20, max = 7000, message = "Описание должно быть от 20 до 7000 символов")
-    @Column(nullable = false, length = 7000) // ИЗМЕНЕНО: используем length вместо columnDefinition
+    @Column(nullable = false, length = 7000)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,13 +43,16 @@ public class Event {
     private User initiator;
 
     @NotNull(message = "Дата события не может быть пустой")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
 
     @NotNull(message = "Дата создания не может быть пустой")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
@@ -61,10 +65,10 @@ public class Event {
 
     @PositiveOrZero(message = "Лимит участников не может быть отрицательным")
     @Column(name = "participant_limit", nullable = false)
-    private int participantLimit;
+    private int participantLimit = 0;
 
     @Column(name = "request_moderation", nullable = false)
-    private boolean requestModeration;
+    private boolean requestModeration = true;
 
     @Column(name = "views", nullable = false)
     private Long views = 0L;

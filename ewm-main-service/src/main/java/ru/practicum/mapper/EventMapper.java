@@ -5,9 +5,9 @@ import ru.practicum.dto.EventDto;
 import ru.practicum.model.Category;
 import ru.practicum.model.Event;
 import ru.practicum.model.EventStatus;
-import ru.practicum.model.Location; // 🆕 правильный импорт
+import ru.practicum.model.Location;
 
-import java.time.LocalDateTime;   // 🆕 добавляем импорт
+import java.time.LocalDateTime;
 
 @Component
 public class EventMapper {
@@ -53,7 +53,7 @@ public class EventMapper {
         event.setStatus(EventStatus.PENDING);
 
         if (dto.getLocation() != null) {
-            event.setLocation(new Location(   // 🆕 теперь правильный класс
+            event.setLocation(new Location(
                     dto.getLocation().getLat(),
                     dto.getLocation().getLon()
             ));
@@ -75,7 +75,7 @@ public class EventMapper {
         if (dto.getParticipantLimit() != null) event.setParticipantLimit(dto.getParticipantLimit());
         if (dto.getRequestModeration() != null) event.setRequestModeration(dto.getRequestModeration());
         if (dto.getLocation() != null) {
-            event.setLocation(new Location(   // 🆕 тоже поправлено
+            event.setLocation(new Location(
                     dto.getLocation().getLat(),
                     dto.getLocation().getLon()
             ));
