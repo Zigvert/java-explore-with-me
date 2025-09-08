@@ -1,26 +1,35 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ewm
-    username: postgres
-    password: postgres
+    # Берём из ENV, а по умолчанию — docker-хост БД
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ewm-main-db:5432/ewm_main_db}
+    username: ${SPRING_DATASOURCE_USERNAME:user}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update # Для разработки; в проде лучше использовать 'validate'
+      # В CI/Docker — none (только валидация/инициализация через schema.sql)
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
     show-sql: true
     properties:
       hibernate.format_sql: true
     open-in-view: false
 
+  sql:
+    init:
+      # Включаем выполнение schema.sql (ENV может переопределить)
+      mode: ${SPRING_SQL_INIT_MODE:always}
+      schema-locations: classpath:schema.sql
+
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
   address: 0.0.0.0
 
 stats:
   service:
-    url: http://localhost:9090
+    # Берём из ENV, а дефолт — имя контейнера stats-сервера
+    url: ${STATS_SERVICE_URL:http://ewm-stats-server:9090}
 
 management:
   endpoints:
@@ -31,7 +40,7 @@ management:
     health:
       show-details: always
   server:
-    port: 8080
+    port: ${SERVER_PORT:8080}
 
 logging:
   level:

@@ -60,7 +60,7 @@ CREATE TABLE participation_requests (
 );
 
 -- ========================================
--- Таблица комментариев к событиям
+-- Таблица комментариев
 -- ========================================
 CREATE TABLE comments (
     id SERIAL PRIMARY KEY,
@@ -71,7 +71,7 @@ CREATE TABLE comments (
 );
 
 -- ========================================
--- Таблица лайков / просмотров событий
+-- Таблица статистики событий
 -- ========================================
 CREATE TABLE event_stats (
     id SERIAL PRIMARY KEY,
@@ -91,29 +91,29 @@ CREATE INDEX idx_events_status ON events(status);
 -- ========================================
 -- Данные пользователей
 -- ========================================
-INSERT INTO users (id, name, email) VALUES
-(1, 'Crystal Gleason', 'Lillie.Jacobson96@gmail.com'),
-(2, 'Jo Shields', 'Pamela.Marks38@gmail.com'),
-(3, 'Brandi Fadel', 'Eduardo.Farrell87@gmail.com'),
-(4, 'Hector Turner', 'Kristy_Wisoky22@hotmail.com'),
-(5, 'Antonio Stehr', 'Misael.Schmidt43@gmail.com');
+INSERT INTO users (name, email) VALUES
+('Crystal Gleason', 'Lillie.Jacobson96@gmail.com'),
+('Jo Shields', 'Pamela.Marks38@gmail.com'),
+('Brandi Fadel', 'Eduardo.Farrell87@gmail.com'),
+('Hector Turner', 'Kristy_Wisoky22@hotmail.com'),
+('Antonio Stehr', 'Misael.Schmidt43@gmail.com');
 
 -- ========================================
 -- Данные категорий
 -- ========================================
-INSERT INTO categories (id, name) VALUES
-(1, 'Concerts'),
-(2, 'Sports'),
-(3, 'Theatre');
+INSERT INTO categories (name) VALUES
+('Concerts'),
+('Sports'),
+('Theatre');
 
 -- ========================================
 -- Данные событий
 -- ========================================
-INSERT INTO events (id, title, annotation, description, category_id, user_id, event_date, created_at, status, is_paid, participant_limit, request_moderation, views, confirmed_requests, lat, lon)
+INSERT INTO events (title, annotation, description, category_id, user_id, event_date, created_at, status, is_paid, participant_limit, request_moderation, views, confirmed_requests, lat, lon)
 VALUES
-(1, 'Rock Concert', 'Awesome rock concert coming soon', 'Full description of rock concert event goes here, more than 20 chars', 1, 1, NOW() + interval '1 day', NOW(), 'PENDING', false, 100, true, 0, 0, 55.750000, 37.610000),
-(2, 'Football Match', 'Exciting football match', 'Detailed description of football match, enough length', 2, 2, NOW() + interval '2 days', NOW(), 'PENDING', false, 50, true, 0, 0, 55.760000, 37.620000),
-(3, 'Theatre Play', 'Amazing theatre play', 'Full description of theatre play event, over 20 characters', 3, 3, NOW() + interval '3 days', NOW(), 'PENDING', true, 30, false, 0, 0, 55.770000, 37.630000);
+('Rock Concert', 'Awesome rock concert coming soon', 'Full description of rock concert event goes here, more than 20 chars', 1, 1, NOW() + interval '1 day', NOW(), 'PENDING', false, 100, true, 0, 0, 55.750000, 37.610000),
+('Football Match', 'Exciting football match', 'Detailed description of football match, enough length', 2, 2, NOW() + interval '2 days', NOW(), 'PENDING', false, 50, true, 0, 0, 55.760000, 37.620000),
+('Theatre Play', 'Amazing theatre play', 'Full description of theatre play event, over 20 characters', 3, 3, NOW() + interval '3 days', NOW(), 'PENDING', true, 30, false, 0, 0, 55.770000, 37.630000);
 
 -- ========================================
 -- Данные запросов на участие
@@ -145,3 +145,4 @@ VALUES
 (1, NULL, 'VIEW'),
 (2, 1, 'VIEW'),
 (3, 5, 'LIKE');
+

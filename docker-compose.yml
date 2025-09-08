@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   stats-db:
     image: postgres:16.1
@@ -67,12 +69,16 @@ services:
     ports:
       - "8080:8080"
     environment:
+      # Коннект к БД сервиса
       SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-main-db:5432/ewm_main_db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      # ВАЖНО: включаем запуск schema.sql
+      SPRING_SQL_INIT_MODE: always
+      # URL сервиса статистики
       STATS_SERVICE_URL: http://ewm-stats-server:9090
       JAVA_OPTS: -Duser.timezone=UTC
-      SPRING_JPA_HIBERNATE_DDL_AUTO: none
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
       interval: 10s
