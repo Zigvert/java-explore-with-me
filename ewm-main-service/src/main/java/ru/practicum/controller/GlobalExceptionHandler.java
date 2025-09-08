@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -26,16 +27,36 @@ public class GlobalExceptionHandler {
     }
 
     // ---- 400 ----
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidation(MethodArgumentNotValidException e) {
+        String errorMessage = e.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .findFirst()
+                .orElse("Validation error");
+        log.warn("Validation failed: {}", errorMessage);
+        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
+    }
+
     @ExceptionHandler({
             IllegalArgumentException.class,
             ConstraintViolationException.class,
-            MissingServletRequestParameterException.class, // нет обязательного параметра (например eventId)
-            MethodArgumentNotValidException.class          // валидация тела запроса
+            MissingServletRequestParameterException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequest(Exception e) {
         log.warn("Bad request: {}", e.getMessage());
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDataIntegrity(DataIntegrityViolationException e) {
+        String message = e.getMostSpecificCause() != null
+                ? e.getMostSpecificCause().getMessage()
+                : e.getMessage();
+        log.warn("Data integrity violation: {}", message);
+        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Database error: " + message);
     }
 
     // ---- 500 ----
