@@ -51,15 +51,12 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public List<CompilationDto> getAll(Boolean pinned, int from, int size) {
         PageRequest page = PageRequest.of(from / size, size);
-
         List<Compilation> compilations = compilationRepository.findAll(page).getContent();
-
         if (pinned != null) {
             compilations = compilations.stream()
                     .filter(c -> c.isPinned() == pinned)
                     .collect(Collectors.toList());
         }
-
         return compilations.stream()
                 .map(compilationMapper::toDto)
                 .collect(Collectors.toList());
@@ -70,12 +67,8 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Compilation not found: " + compId));
 
-        if (request.getTitle() != null) {
-            compilation.setTitle(request.getTitle());
-        }
-        if (request.getPinned() != null) {
-            compilation.setPinned(request.getPinned());
-        }
+        if (request.getTitle() != null) compilation.setTitle(request.getTitle());
+        if (request.getPinned() != null) compilation.setPinned(request.getPinned());
         if (request.getEvents() != null) {
             List<Event> events = request.getEvents().isEmpty()
                     ? List.of()

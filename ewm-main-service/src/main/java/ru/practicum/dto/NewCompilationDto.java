@@ -13,6 +13,6 @@ public class NewCompilationDto {
     @NotBlank(message = "Title cannot be blank")
     private String title;
 
-    private Boolean pinned = false;              // 🔹 по умолчанию false
-    private List<Long> events = List.of();       // 🔹 пустой список по умолчанию
+    private Boolean pinned = false;
+    private List<Long> events = List.of(); // дефолт пустой список
 }

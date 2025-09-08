@@ -21,26 +21,23 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // ---- 404 Not Found ----
-    @ExceptionHandler({jakarta.persistence.EntityNotFoundException.class, NotFoundException.class})
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(Exception e) {
         log.warn("Entity not found: {}", e.getMessage());
         return new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
     }
 
-    // ---- 400 Bad Request (валидация DTO) ----
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidation(MethodArgumentNotValidException e) {
         String errors = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .collect(Collectors.joining("; "));
         log.warn("Validation failed: {}", errors);
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errors);
     }
 
-    // ---- 400 Bad Request (невалидные параметры) ----
     @ExceptionHandler({
             IllegalArgumentException.class,
             ConstraintViolationException.class,
@@ -53,18 +50,16 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
 
-    // ---- 409 Conflict (конфликты БД) ----
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDataIntegrity(DataIntegrityViolationException e) {
+    public ErrorResponse handleConflict(DataIntegrityViolationException e) {
         String message = e.getMostSpecificCause() != null
                 ? e.getMostSpecificCause().getMessage()
                 : e.getMessage();
-        log.warn("Data integrity violation: {}", message);
+        log.warn("Data conflict: {}", message);
         return new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict: " + message);
     }
 
-    // ---- 500 Internal Server Error ----
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleUnexpected(Exception e) {
@@ -73,4 +68,3 @@ public class GlobalExceptionHandler {
                 "Unexpected error: " + e.getMessage());
     }
 }
-

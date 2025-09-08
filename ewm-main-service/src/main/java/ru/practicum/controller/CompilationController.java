@@ -13,13 +13,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping
 public class CompilationController {
 
     private final CompilationService compilationService;
 
     // ----------------------------
-    // Получение всех подборок
+    // Публичный эндпоинт: просмотр подборок
     // ----------------------------
     @GetMapping("/compilations")
     public List<CompilationDto> getAll(
@@ -30,7 +29,7 @@ public class CompilationController {
     }
 
     // ----------------------------
-    // Создание подборки (админ)
+    // Админ: создание подборки
     // ----------------------------
     @PostMapping("/admin/compilations")
     @ResponseStatus(HttpStatus.CREATED)
@@ -39,7 +38,7 @@ public class CompilationController {
     }
 
     // ----------------------------
-    // Обновление подборки (админ)
+    // Админ: обновление подборки
     // ----------------------------
     @PatchMapping("/admin/compilations/{compId}")
     public CompilationDto update(
@@ -49,7 +48,7 @@ public class CompilationController {
     }
 
     // ----------------------------
-    // Удаление подборки (админ)
+    // Админ: удаление подборки
     // ----------------------------
     @DeleteMapping("/admin/compilations/{compId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
