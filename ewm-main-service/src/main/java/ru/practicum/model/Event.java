@@ -43,16 +43,16 @@ public class Event {
     private User initiator;
 
     @NotNull(message = "Дата события не может быть пустой")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss") // ✅ выровнено
     @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
 
     @NotNull(message = "Дата создания не может быть пустой")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss") // ✅ выровнено
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss") // ✅ выровнено
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 

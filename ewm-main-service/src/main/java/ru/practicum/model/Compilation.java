@@ -19,7 +19,8 @@ public class Compilation {
 
     private String title;
 
-    private Boolean pinned = false;  // ✅ использовать Boolean вместо boolean
+    @Builder.Default
+    private Boolean pinned = false;
 
     @ManyToMany
     @JoinTable(
@@ -28,5 +29,5 @@ public class Compilation {
             inverseJoinColumns = @JoinColumn(name = "event_id")
     )
     @Builder.Default
-    private List<Event> events = new ArrayList<>();  // ✅ инициализация пустым списком
+    private List<Event> events = new ArrayList<>(); // ✅ пустой список по умолчанию
 }

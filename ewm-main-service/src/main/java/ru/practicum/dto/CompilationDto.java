@@ -1,6 +1,7 @@
 package ru.practicum.dto;
 
 import lombok.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -11,5 +12,7 @@ public class CompilationDto {
     private Long id;
     private String title;
     private Boolean pinned;
-    private List<EventDto> events;
+
+    @Builder.Default
+    private List<EventDto> events = new ArrayList<>(); // ✅ всегда список, даже если пустой
 }

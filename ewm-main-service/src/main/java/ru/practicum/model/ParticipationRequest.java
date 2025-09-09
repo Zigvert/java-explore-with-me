@@ -21,7 +21,8 @@ public class ParticipationRequest {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private RequestStatus status; // PENDING, CONFIRMED, REJECTED, CANCELED
+    @Builder.Default
+    private RequestStatus status = RequestStatus.PENDING; // ✅ дефолт
 
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)

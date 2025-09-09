@@ -3,6 +3,7 @@ package ru.practicum.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -10,9 +11,13 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class NewCompilationDto {
+
     @NotBlank(message = "Title cannot be blank")
     private String title;
 
+    @Builder.Default
     private Boolean pinned = false;
-    private List<Long> events = List.of();
+
+    @Builder.Default
+    private List<Long> events = new ArrayList<>(); // ✅ вместо List.of()
 }
