@@ -19,21 +19,25 @@ public class CompilationMapper {
     }
 
     public CompilationDto toDto(Compilation compilation) {
+        if (compilation == null) return null;
+
         return CompilationDto.builder()
                 .id(compilation.getId())
                 .title(compilation.getTitle())
                 .pinned(Boolean.TRUE.equals(compilation.getPinned()))
                 .events(compilation.getEvents() != null
-                        ? compilation.getEvents().stream().map(eventMapper::toDto).collect(Collectors.toList())
+                        ? compilation.getEvents().stream()
+                        .map(eventMapper::toDto)
+                        .collect(Collectors.toList())
                         : List.of())
                 .build();
     }
 
     public Compilation fromNewDto(NewCompilationDto dto, List<Event> events) {
-        return Compilation.builder()
-                .title(dto.getTitle())
-                .pinned(dto.getPinned())
-                .events(events != null ? events : List.of())
-                .build();
+        Compilation compilation = new Compilation();
+        compilation.setTitle(dto.getTitle());
+        compilation.setPinned(dto.getPinned() != null ? dto.getPinned() : false);
+        compilation.setEvents(events != null ? events : List.of());
+        return compilation;
     }
 }

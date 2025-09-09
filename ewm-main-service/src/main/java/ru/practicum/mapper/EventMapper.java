@@ -49,7 +49,7 @@ public class EventMapper {
         event.setPaid(dto.getPaid() != null ? dto.getPaid() : false);
         event.setParticipantLimit(dto.getParticipantLimit() != null ? dto.getParticipantLimit() : 0);
         event.setRequestModeration(dto.getRequestModeration() != null ? dto.getRequestModeration() : true);
-        event.setCategory(category);
+        event.setCategory(category); // берём category из сервиса
         event.setInitiator(initiator);
         event.setCreatedAt(LocalDateTime.now());
         event.setStatus(EventStatus.PENDING);
