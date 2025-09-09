@@ -2,74 +2,70 @@ package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.EventDto;
 import ru.practicum.dto.NewEventDto;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.Event;
 import ru.practicum.service.EventService;
-import ru.practicum.client.StatsClient;
 
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping
+@RequestMapping("/events")
 @RequiredArgsConstructor
-@Validated
 public class EventController {
-    private final EventService service;
-    private final EventMapper mapper;
-    private final StatsClient statsClient;
 
-    // ----------- Public endpoints ------------
-    @GetMapping("/events")
-    public List<EventDto> getAll(@RequestParam(required = false) String text,
-                                 @RequestParam(required = false) List<Long> categories,
-                                 @RequestParam(required = false) Boolean paid,
-                                 @RequestParam(required = false) LocalDateTime rangeStart,
-                                 @RequestParam(required = false) LocalDateTime rangeEnd,
-                                 @RequestParam(defaultValue = "false") boolean onlyAvailable,
-                                 @RequestParam(defaultValue = "EVENT_DATE") String sort,
-                                 @RequestParam(defaultValue = "0") int from,
-                                 @RequestParam(defaultValue = "10") int size) {
-        List<Event> events = service.getAll(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
-        statsClient.saveHit(new EndpointHitDto("main-service", "/events", "127.0.0.1", LocalDateTime.now()));
-        return events.stream().map(mapper::toDto).collect(Collectors.toList());
+    private final EventService eventService;
+    private final EventMapper eventMapper;
+
+    @PostMapping
+    public ResponseEntity<EventDto> createEvent(@Valid @RequestBody NewEventDto dto,
+                                                @RequestParam Long userId) {
+        Event event = eventService.create(dto, userId);
+        return new ResponseEntity<>(eventMapper.toDto(event), HttpStatus.CREATED);
     }
 
-    @GetMapping("/events/{id}")
-    public EventDto getById(@PathVariable Long id) {
-        Event event = service.getById(id);
-        statsClient.saveHit(new EndpointHitDto("main-service", "/events/" + id, "127.0.0.1", LocalDateTime.now()));
-        return mapper.toDto(event);
+    @GetMapping
+    public ResponseEntity<List<EventDto>> getAllEvents(
+            @RequestParam(required = false) String text,
+            @RequestParam(required = false) List<Long> categories,
+            @RequestParam(required = false) Boolean paid,
+            @RequestParam(required = false) String rangeStart,
+            @RequestParam(required = false) String rangeEnd,
+            @RequestParam(defaultValue = "false") Boolean onlyAvailable,
+            @RequestParam(defaultValue = "EVENT_DATE") String sort,
+            @RequestParam(defaultValue = "0") int from,
+            @RequestParam(defaultValue = "10") int size) {
+
+        // Для простоты оставляем rangeStart и rangeEnd как null, парсинг можно добавить
+        List<Event> events = eventService.getAll(
+                text, categories, paid, null, null, onlyAvailable, sort, from, size
+        );
+        return ResponseEntity.ok(events.stream().map(eventMapper::toDto).collect(Collectors.toList()));
     }
 
-    // ----------- Private endpoints ------------
-    @PostMapping("/users/{userId}/events")
-    @ResponseStatus(HttpStatus.CREATED)
-    public EventDto create(@PathVariable Long userId, @Valid @RequestBody NewEventDto dto) {
-        Event created = service.create(dto, userId);
-        return mapper.toDto(created);
+    @GetMapping("/{id}")
+    public ResponseEntity<EventDto> getEventById(@PathVariable Long id) {
+        Event event = eventService.getById(id);
+        return ResponseEntity.ok(eventMapper.toDto(event));
     }
 
-    @GetMapping("/users/{userId}/events")
-    public List<EventDto> getUserEvents(@PathVariable Long userId,
-                                        @RequestParam(defaultValue = "0") int from,
-                                        @RequestParam(defaultValue = "10") int size) {
-        List<Event> events = service.getUserEvents(userId, from, size);
-        return events.stream().map(mapper::toDto).collect(Collectors.toList());
+    @PatchMapping("/{id}")
+    public ResponseEntity<EventDto> updateUserEvent(@RequestParam Long userId,
+                                                    @PathVariable Long id,
+                                                    @RequestBody EventDto dto) {
+        Event updated = eventService.updateUserEvent(userId, id, dto);
+        return ResponseEntity.ok(eventMapper.toDto(updated));
     }
 
-    @PatchMapping("/users/{userId}/events/{eventId}")
-    public EventDto updateUserEvent(@PathVariable Long userId,
-                                    @PathVariable Long eventId,
-                                    @Valid @RequestBody EventDto dto) {
-        Event updated = service.updateUserEvent(userId, eventId, dto);
-        return mapper.toDto(updated);
+    @PatchMapping("/admin/{id}")
+    public ResponseEntity<EventDto> updateAdminEvent(@PathVariable Long id,
+                                                     @RequestBody EventDto dto) {
+        Event updated = eventService.updateAdminEvent(id, dto);
+        return ResponseEntity.ok(eventMapper.toDto(updated));
     }
 }

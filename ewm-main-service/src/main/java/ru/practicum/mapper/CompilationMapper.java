@@ -19,8 +19,6 @@ public class CompilationMapper {
     }
 
     public CompilationDto toDto(Compilation compilation) {
-        if (compilation == null) return null;
-
         return CompilationDto.builder()
                 .id(compilation.getId())
                 .title(compilation.getTitle())
@@ -34,10 +32,10 @@ public class CompilationMapper {
     }
 
     public Compilation fromNewDto(NewCompilationDto dto, List<Event> events) {
-        Compilation compilation = new Compilation();
-        compilation.setTitle(dto.getTitle());
-        compilation.setPinned(dto.getPinned() != null ? dto.getPinned() : false);
-        compilation.setEvents(events != null ? events : List.of());
-        return compilation;
+        return Compilation.builder()
+                .title(dto.getTitle())
+                .pinned(dto.getPinned())
+                .events(events)
+                .build();
     }
 }

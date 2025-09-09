@@ -42,7 +42,6 @@ public class EventService {
         }
 
         Event event = eventMapper.toEntity(dto, category, initiator);
-
         validateEvent(event);
         return eventRepository.save(event);
     }
@@ -60,6 +59,7 @@ public class EventService {
 
         int page = from / size;
         Sort sortOption;
+
         if ("EVENT_DATE".equalsIgnoreCase(sort)) {
             sortOption = Sort.by("eventDate").ascending();
         } else if ("VIEWS".equalsIgnoreCase(sort)) {
@@ -90,7 +90,7 @@ public class EventService {
                 .orElseThrow(() -> new EntityNotFoundException("Event not found: " + id));
 
         if (event.getStatus() != EventStatus.PUBLISHED) {
-            throw new EntityNotFoundException("Event is not published: " + id);
+            throw new IllegalArgumentException("Event is not published: " + id);
         }
 
         event.setViews(event.getViews() + 1);
@@ -119,6 +119,7 @@ public class EventService {
         if (!existingEvent.getInitiator().getId().equals(userId)) {
             throw new IllegalArgumentException("User is not the initiator of the event: " + eventId);
         }
+
         if (existingEvent.getStatus() == EventStatus.PUBLISHED) {
             throw new IllegalArgumentException("Cannot update published event: " + eventId);
         }

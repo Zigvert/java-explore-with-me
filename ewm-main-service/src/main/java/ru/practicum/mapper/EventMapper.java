@@ -36,7 +36,6 @@ public class EventMapper {
                     event.getLocation().getLon()
             ));
         }
-
         return dto;
     }
 
@@ -59,7 +58,6 @@ public class EventMapper {
         if (dto.getLocation() != null) {
             event.setLocation(new Location(dto.getLocation().getLat(), dto.getLocation().getLon()));
         }
-
         return event;
     }
 
