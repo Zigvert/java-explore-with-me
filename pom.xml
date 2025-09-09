@@ -11,12 +11,12 @@
 		<relativePath/>
 	</parent>
 
-	<name>Explore With Me</name>
-
 	<groupId>ru.practicum</groupId>
 	<artifactId>explore-with-me</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
+
+	<name>Explore With Me</name>
 
 	<properties>
 		<java.version>21</java.version>
@@ -27,11 +27,13 @@
 		<module>ewm-stats-dto</module>
 		<module>ewm-stats-client</module>
 		<module>ewm-stats-service</module>
+		<module>ewm-main-service</module>
 	</modules>
 
 	<build>
 		<pluginManagement>
 			<plugins>
+				<!-- Surefire -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
@@ -41,6 +43,8 @@
 						</systemPropertyVariables>
 					</configuration>
 				</plugin>
+
+				<!-- Checkstyle -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
@@ -53,9 +57,7 @@
 					</configuration>
 					<executions>
 						<execution>
-							<goals>
-								<goal>check</goal>
-							</goals>
+							<goals><goal>check</goal></goals>
 							<phase>compile</phase>
 						</execution>
 					</executions>
@@ -67,6 +69,8 @@
 						</dependency>
 					</dependencies>
 				</plugin>
+
+				<!-- SpotBugs -->
 				<plugin>
 					<groupId>com.github.spotbugs</groupId>
 					<artifactId>spotbugs-maven-plugin</artifactId>
@@ -77,12 +81,12 @@
 					</configuration>
 					<executions>
 						<execution>
-							<goals>
-								<goal>check</goal>
-							</goals>
+							<goals><goal>check</goal></goals>
 						</execution>
 					</executions>
 				</plugin>
+
+				<!-- JaCoCo -->
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
@@ -93,15 +97,11 @@
 					<executions>
 						<execution>
 							<id>jacoco-initialize</id>
-							<goals>
-								<goal>prepare-agent</goal>
-							</goals>
+							<goals><goal>prepare-agent</goal></goals>
 						</execution>
 						<execution>
 							<id>jacoco-check</id>
-							<goals>
-								<goal>check</goal>
-							</goals>
+							<goals><goal>check</goal></goals>
 							<configuration>
 								<rules>
 									<rule>
@@ -145,50 +145,11 @@
 						<execution>
 							<id>jacoco-site</id>
 							<phase>install</phase>
-							<goals>
-								<goal>report</goal>
-							</goals>
+							<goals><goal>report</goal></goals>
 						</execution>
 					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>check</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-					</plugin>
-					<plugin>
-						<groupId>com.github.spotbugs</groupId>
-						<artifactId>spotbugs-maven-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
-			<reporting>
-				<plugins>
-					<plugin>
-						<groupId>com.github.spotbugs</groupId>
-						<artifactId>spotbugs-maven-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</reporting>
-		</profile>
-		<profile>
-			<id>coverage</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
