@@ -24,9 +24,7 @@ public class CompilationMapper {
                 .title(compilation.getTitle())
                 .pinned(Boolean.TRUE.equals(compilation.getPinned()))
                 .events(compilation.getEvents() != null
-                        ? compilation.getEvents().stream()
-                        .map(eventMapper::toDto)
-                        .collect(Collectors.toList())
+                        ? compilation.getEvents().stream().map(eventMapper::toDto).collect(Collectors.toList())
                         : List.of())
                 .build();
     }
@@ -35,7 +33,7 @@ public class CompilationMapper {
         return Compilation.builder()
                 .title(dto.getTitle())
                 .pinned(dto.getPinned())
-                .events(events)
+                .events(events != null ? events : List.of())
                 .build();
     }
 }

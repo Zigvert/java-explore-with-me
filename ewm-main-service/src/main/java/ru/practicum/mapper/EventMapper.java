@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 public class EventMapper {
 
     public EventDto toDto(Event event) {
+        if (event == null) return null;
+
         EventDto dto = new EventDto();
         dto.setId(event.getId());
         dto.setTitle(event.getTitle());
@@ -27,16 +29,17 @@ public class EventMapper {
         dto.setPublishedOn(event.getPublishedAt());
         dto.setViews(event.getViews());
         dto.setConfirmedRequests(event.getConfirmedRequests());
+
         if (event.getLocation() != null) {
             dto.setLocation(new EventDto.LocationDto(
                     event.getLocation().getLat(),
                     event.getLocation().getLon()
             ));
         }
+
         return dto;
     }
 
-    // Создание нового события из NewEventDto
     public Event toEntity(NewEventDto dto, Category category, User initiator) {
         Event event = new Event();
         event.setTitle(dto.getTitle());
@@ -46,22 +49,17 @@ public class EventMapper {
         event.setPaid(dto.getPaid() != null ? dto.getPaid() : false);
         event.setParticipantLimit(dto.getParticipantLimit() != null ? dto.getParticipantLimit() : 0);
         event.setRequestModeration(dto.getRequestModeration() != null ? dto.getRequestModeration() : true);
-
         event.setCategory(category);
         event.setInitiator(initiator);
-
-        // дефолты
         event.setCreatedAt(LocalDateTime.now());
         event.setStatus(EventStatus.PENDING);
         event.setViews(0L);
         event.setConfirmedRequests(0);
 
         if (dto.getLocation() != null) {
-            event.setLocation(new Location(
-                    dto.getLocation().getLat(),
-                    dto.getLocation().getLon()
-            ));
+            event.setLocation(new Location(dto.getLocation().getLat(), dto.getLocation().getLon()));
         }
+
         return event;
     }
 
@@ -79,10 +77,7 @@ public class EventMapper {
         if (dto.getParticipantLimit() != null) event.setParticipantLimit(dto.getParticipantLimit());
         if (dto.getRequestModeration() != null) event.setRequestModeration(dto.getRequestModeration());
         if (dto.getLocation() != null) {
-            event.setLocation(new Location(
-                    dto.getLocation().getLat(),
-                    dto.getLocation().getLon()
-            ));
+            event.setLocation(new Location(dto.getLocation().getLat(), dto.getLocation().getLon()));
         }
     }
 }

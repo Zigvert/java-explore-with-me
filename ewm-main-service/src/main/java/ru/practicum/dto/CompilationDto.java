@@ -14,5 +14,5 @@ public class CompilationDto {
     private Boolean pinned;
 
     @Builder.Default
-    private List<EventDto> events = new ArrayList<>(); // ✅ всегда список, даже если пустой
+    private List<EventDto> events = new ArrayList<>();
 }
