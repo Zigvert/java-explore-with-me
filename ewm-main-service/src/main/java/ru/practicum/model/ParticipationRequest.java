@@ -3,32 +3,27 @@ package ru.practicum.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
-@Table(name = "requests")
+@Table(name = "participation_requests")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ParticipationRequest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "created", nullable = false)
-    private LocalDateTime created;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    @Builder.Default
-    private RequestStatus status = RequestStatus.PENDING; // ✅ дефолт
-
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "requester_id", nullable = false)
     private User requester;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RequestStatus status;
 }
