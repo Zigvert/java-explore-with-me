@@ -14,5 +14,5 @@ public class UpdateCompilationRequest {
     private Boolean pinned;
 
     @Builder.Default
-    private List<Long> events = new ArrayList<>(); // ✅ всегда список
+    private List<Long> events = new ArrayList<>();
 }

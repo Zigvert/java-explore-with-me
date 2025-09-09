@@ -34,8 +34,8 @@ public class CompilationMapper {
     public Compilation fromNewDto(NewCompilationDto dto, List<Event> events) {
         return Compilation.builder()
                 .title(dto.getTitle())
-                .pinned(dto.getPinned())
-                .events(events)
+                .pinned(Boolean.TRUE.equals(dto.getPinned()))
+                .events(events != null ? events : List.of())
                 .build();
     }
 }
