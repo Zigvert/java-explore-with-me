@@ -19,5 +19,5 @@ public class NewCompilationDto {
     private Boolean pinned = false;
 
     @Builder.Default
-    private List<Long> events = new ArrayList<>(); // ✅ вместо List.of()
+    private List<Long> events = new ArrayList<>(); // ✅ вместо List.of() чтобы не падало при изменении
 }

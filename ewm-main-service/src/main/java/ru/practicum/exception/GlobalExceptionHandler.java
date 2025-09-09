@@ -1,50 +1,68 @@
 package ru.practicum.exception;
 
+import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import jakarta.persistence.EntityNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+import java.util.stream.Collectors;
+
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 400 Bad Request — ошибки валидации
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleNotFound(Exception e) {
+        log.warn("Entity not found: {}", e.getMessage());
+        return new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.put(error.getField(), error.getDefaultMessage());
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidation(MethodArgumentNotValidException e) {
+        String errors = e.getBindingResult().getFieldErrors().stream()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        log.warn("Validation failed: {}", errors);
+        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errors);
     }
 
-    // 404 Not Found — сущность не найдена
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleEntityNotFoundException(EntityNotFoundException ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    @ExceptionHandler({
+            IllegalArgumentException.class,
+            ConstraintViolationException.class,
+            MissingServletRequestParameterException.class,
+            HttpMessageNotReadableException.class
+    })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBadRequest(Exception e) {
+        log.warn("Bad request: {}", e.getMessage());
+        return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
 
-    // 409 Conflict — конфликтные ситуации
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConflict(DataIntegrityViolationException e) {
+        String message = e.getMostSpecificCause() != null
+                ? e.getMostSpecificCause().getMessage()
+                : e.getMessage();
+        log.warn("Data conflict: {}", message);
+        return new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict: " + message);
     }
 
-    // 500 Internal Server Error — все остальные непредвиденные ошибки
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleAllExceptions(Exception ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", "Internal server error: " + ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleUnexpected(Exception e) {
+        log.error("Unexpected error", e);
+        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Unexpected error: " + e.getMessage());
     }
 }
