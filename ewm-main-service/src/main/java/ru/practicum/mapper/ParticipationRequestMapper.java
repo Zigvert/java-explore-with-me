@@ -12,10 +12,10 @@ public class ParticipationRequestMapper {
 
         return ParticipationRequestDto.builder()
                 .id(request.getId())
-                .created(request.getCreated())
-                .status(request.getStatus().name())
                 .eventId(request.getEvent().getId())
                 .requesterId(request.getRequester().getId())
+                .status(request.getStatus().name())
+                .created(request.getCreated()) // <-- теперь будет работать
                 .build();
     }
 }

@@ -2,6 +2,7 @@ package ru.practicum.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "participation_requests")
@@ -26,4 +27,7 @@ public class ParticipationRequest {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RequestStatus status;
+
+    @Column(nullable = false)
+    private LocalDateTime created; // <-- добавлено
 }
