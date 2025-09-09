@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import ru.practicum.dto.EventDto;
+import ru.practicum.dto.NewEventDto;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.Category;
 import ru.practicum.model.Event;
@@ -30,20 +31,14 @@ public class EventService {
     private final EventMapper eventMapper;
 
     @Transactional
-    public Event create(EventDto dto, Long userId, Long categoryId) {
+    public Event create(NewEventDto dto, Long userId) {
         User initiator = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
 
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException("Category not found: " + categoryId));
+        Category category = categoryRepository.findById(dto.getCategory())
+                .orElseThrow(() -> new EntityNotFoundException("Category not found: " + dto.getCategory()));
 
-        Event event = eventMapper.toEntityForCreate(dto);
-        event.setInitiator(initiator);
-        event.setCategory(category);
-        event.setViews(0L);
-        event.setConfirmedRequests(0);
-        event.setCreatedAt(LocalDateTime.now());
-        event.setStatus(EventStatus.PENDING);
+        Event event = eventMapper.toEntity(dto, category, initiator);
 
         validateEvent(event);
         return eventRepository.save(event);

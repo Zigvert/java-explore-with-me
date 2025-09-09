@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.EventDto;
+import ru.practicum.dto.NewEventDto;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.Event;
 import ru.practicum.service.EventService;
@@ -51,8 +52,8 @@ public class EventController {
     // ----------- Private endpoints ------------
     @PostMapping("/users/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
-    public EventDto create(@PathVariable Long userId, @Valid @RequestBody EventDto dto) {
-        Event created = service.create(dto, userId, dto.getCategoryId());
+    public EventDto create(@PathVariable Long userId, @Valid @RequestBody NewEventDto dto) {
+        Event created = service.create(dto, userId);
         return mapper.toDto(created);
     }
 

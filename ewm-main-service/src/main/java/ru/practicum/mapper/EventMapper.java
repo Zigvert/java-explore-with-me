@@ -2,10 +2,8 @@ package ru.practicum.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.dto.EventDto;
-import ru.practicum.model.Category;
-import ru.practicum.model.Event;
-import ru.practicum.model.EventStatus;
-import ru.practicum.model.Location;
+import ru.practicum.dto.NewEventDto;
+import ru.practicum.model.*;
 
 import java.time.LocalDateTime;
 
@@ -38,7 +36,8 @@ public class EventMapper {
         return dto;
     }
 
-    public Event toEntityForCreate(EventDto dto) {
+    // Создание нового события из NewEventDto
+    public Event toEntity(NewEventDto dto, Category category, User initiator) {
         Event event = new Event();
         event.setTitle(dto.getTitle());
         event.setAnnotation(dto.getAnnotation());
@@ -48,9 +47,14 @@ public class EventMapper {
         event.setParticipantLimit(dto.getParticipantLimit() != null ? dto.getParticipantLimit() : 0);
         event.setRequestModeration(dto.getRequestModeration() != null ? dto.getRequestModeration() : true);
 
+        event.setCategory(category);
+        event.setInitiator(initiator);
+
         // дефолты
         event.setCreatedAt(LocalDateTime.now());
         event.setStatus(EventStatus.PENDING);
+        event.setViews(0L);
+        event.setConfirmedRequests(0);
 
         if (dto.getLocation() != null) {
             event.setLocation(new Location(
