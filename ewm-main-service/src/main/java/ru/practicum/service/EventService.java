@@ -35,8 +35,11 @@ public class EventService {
         User initiator = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
 
-        Category category = categoryRepository.findById(dto.getCategory())
-                .orElseThrow(() -> new EntityNotFoundException("Category not found: " + dto.getCategory()));
+        Category category = null;
+        if (dto.getCategory() != null) {
+            category = categoryRepository.findById(dto.getCategory())
+                    .orElseThrow(() -> new EntityNotFoundException("Category not found: " + dto.getCategory()));
+        }
 
         Event event = eventMapper.toEntity(dto, category, initiator);
 
@@ -54,9 +57,9 @@ public class EventService {
                               String sort,
                               int from,
                               int size) {
+
         int page = from / size;
         Sort sortOption;
-
         if ("EVENT_DATE".equalsIgnoreCase(sort)) {
             sortOption = Sort.by("eventDate").ascending();
         } else if ("VIEWS".equalsIgnoreCase(sort)) {

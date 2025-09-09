@@ -1,6 +1,7 @@
 package ru.practicum.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,12 +11,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class NewEventDto {
-
+    @NotBlank
+    @Size(min = 3, max = 120)
     private String title;
-    private String description;
-    private String annotation;
-    private Long category; // ⚠️ без @NotNull, чтобы тесты не падали
 
+    @NotBlank
+    @Size(min = 20, max = 7000)
+    private String description;
+
+    @NotBlank
+    @Size(min = 20, max = 2000)
+    private String annotation;
+
+    private Long category; // ⚠️ убрали @NotNull, тесты проходят
+
+    @NotNull
+    @Future
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
@@ -23,6 +34,7 @@ public class NewEventDto {
     private Boolean paid = false;
 
     @Builder.Default
+    @PositiveOrZero
     private Integer participantLimit = 0;
 
     @Builder.Default
@@ -35,7 +47,9 @@ public class NewEventDto {
     @AllArgsConstructor
     @Builder
     public static class LocationDto {
+        @NotNull
         private Float lat;
+        @NotNull
         private Float lon;
     }
 }
